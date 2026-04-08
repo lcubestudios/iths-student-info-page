@@ -1299,6 +1299,17 @@
     .section-divider { padding: 0 24px; }
   }
 
+  @media (hover: none) {
+    .idea-card:hover:not(.flipped) {
+      border-color: var(--border);
+      background: var(--bg2);
+    }
+    .idea-card.ghost:hover:not(.flipped) {
+      border-color: var(--border);
+      background: transparent;
+    }
+  }
+  
   @media (max-width: 600px) {
     .tabs { overflow-x: auto; }
     .tabs .tab { flex-shrink: 0; }
