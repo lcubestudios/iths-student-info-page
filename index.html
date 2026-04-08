@@ -346,7 +346,7 @@
   }
 
   .section + .section {
-    padding-top: 80px;
+    padding-top: 60px;
   }
 
   /* ─── HERO ─── */
@@ -979,16 +979,66 @@
   }
 
   .idea-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 16px 18px;
-    transition: border-color 0.15s, background 0.15s;
-    cursor: default;
-  }
-  .idea-card:hover { border-color: var(--accent); }
-  .idea-card.ghost { background: transparent; border-style: dashed; }
-  .idea-card.ghost:hover { border-color: var(--accent); background: transparent; }
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  height: 160px;
+  perspective: 1000px;
+}
+
+.idea-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.idea-card.flipped .idea-card-inner {
+  transform: rotateY(180deg);
+}
+
+.idea-card:hover:not(.flipped) {
+  border-color: var(--accent);
+  background: var(--bg3);
+}
+
+.idea-card-front, .idea-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  padding: 16px 18px;
+  border-radius: 6px;
+}
+
+.idea-card-back {
+  transform: rotateY(180deg);
+  background: var(--bg3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.idea-card-back .idea-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.idea-card-hint {
+  font-size: 9px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+}
+
+.idea-card.ghost { background: transparent; border-style: dashed; }
+.idea-card.ghost:hover:not(.flipped) { border-color: var(--accent); background: transparent; }
 
   .idea-num {
     font-size: 10px;
@@ -1122,6 +1172,41 @@
   .criteria-text strong { color: var(--text); display: block; margin-bottom: 2px; font-size: 13px; }
   .criteria-text { color: var(--text-muted); line-height: 1.5; }
 
+  .prize-tba {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.prize-shimmer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.prize-shimmer-bar {
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--border) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+  width: 100%;
+}
+
+.prize-shimmer-bar.short {
+  width: 40%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
   /* ─── FOOTER ─── */
   .footer {
     padding: 32px 60px 40px;
@@ -1180,7 +1265,7 @@
   /* ─── SECTION DIVIDER ─── */
   .section-divider {
     padding: 0 60px;
-    margin: 60px 0 0;
+    margin: 40px 0 0;
   }
 
   .divider-line {
@@ -1315,8 +1400,7 @@
           <div class="hs-row">
             <div class="hs-date">
               <span class="hs-month">APR</span>
-              <span class="hs-day">14</span>
-              <span class="hs-extra">&ndash;24</span>
+              <span class="hs-day">14&ndash;24</span>
             </div>
             <div class="hs-event">Workshops<span class="hs-sub">AI · UI/UX · Backend · Fullstack · Pitching</span></div>
             <div class="hs-time">10:45&ndash;12:20</div>
@@ -1368,7 +1452,7 @@
               </a>
             </div>
             <div class="workshop-inner">
-              <div class="workshop-date">Tuesday, April 14 (In-Person)</div>
+              <div class="workshop-date">Tuesday, April 14</div>
               <div class="workshop-title">Luis Muñoz</div>
               <div class="workshop-speaker">AI</div>
               <div class="workshop-desc">LLMs, prompt engineering, and integrating AI APIs — hands-on with real tools.</div>
@@ -1383,7 +1467,7 @@
               </a>
             </div>
             <div class="workshop-inner">
-              <div class="workshop-date">Thursday, April 16 (Virtual)</div>
+              <div class="workshop-date">Thursday, April 16</div>
               <div class="workshop-title">Imran Zafar</div>
               <div class="workshop-speaker">AI</div>
               <div class="workshop-desc">[Fill]</div>
@@ -1396,7 +1480,7 @@
                   <img src="sudeep.jpeg" alt="Sudeep Kesh">
                 </a>
                 <div>
-                  <div class="workshop-date">Thursday, April 16 (Virtual)</div>
+                  <div class="workshop-date">Thursday, April 16</div>
                   <div class="workshop-title">Sudeep Kesh</div>
                   <div class="workshop-speaker">AI</div>
                   <div class="workshop-desc">[Fill]</div>
@@ -1413,7 +1497,7 @@
               </a>
             </div>
             <div class="workshop-inner">
-              <div class="workshop-date">Friday, April 17 (In-Person)</div>
+              <div class="workshop-date">Friday, April 17</div>
               <div class="workshop-title">Jason Jerez</div>
               <div class="workshop-speaker">UI/UX</div>
               <div class="workshop-desc">Design principles, user flows, and Figma prototyping — why good design is how things work, not how they look.</div>
@@ -1428,7 +1512,7 @@
               </a>
             </div>
             <div class="workshop-inner">
-              <div class="workshop-date">Monday, April 20 (In-Person)</div>
+              <div class="workshop-date">Monday, April 20</div>
               <div class="workshop-title">Yoshihiro Olson</div>
               <div class="workshop-speaker">Backend</div>
               <div class="workshop-desc">REST APIs, databases, and auth — build a small API from scratch and understand how data actually flows.</div>
@@ -1443,7 +1527,7 @@
               </a>
             </div>
             <div class="workshop-inner">
-              <div class="workshop-date">Wednesday, April 22 (In-Person)</div>
+              <div class="workshop-date">Wednesday, April 22</div>
               <div class="workshop-title">Aaron Alexander</div>
               <div class="workshop-speaker">Full Stack</div>
               <div class="workshop-desc">Connect frontend to backend, manage state, and deploy — the full picture of how products ship.</div>
@@ -1456,7 +1540,7 @@
               <a href="https://www.linkedin.com/in/shekhar-kapoor-3262979/" target="_blank" class="workshop-avatar av-pitch">SK</a>
             </div>
             <div class="workshop-inner">
-              <div class="workshop-date">Friday, April 24 (In-Person)</div>
+              <div class="workshop-date">Friday, April 24</div>
               <div class="workshop-title">Shekhar Kapoor</div>
               <div class="workshop-speaker">Pitching</div>
               <div class="workshop-desc">Structure a 3-minute pitch, run a live demo, and field judge questions — then practice before the real thing.</div>
@@ -1473,7 +1557,7 @@
       </div>
 
       <!-- ── HACKATHON ── -->
-      <section class="section fade-in" id="hackathon">
+      <section class="section fade-in" id="hackathon" style="padding-bottom:25px;">
 
         <!-- Theme banner -->
         <div class="hackathon-banner">
@@ -1507,37 +1591,92 @@
         <!-- Idea grid -->
         <div class="idea-grid-label">// idea_space/suggested_topics: starting points, not exhaustive</div>
         <div class="idea-grid">
-          <div class="idea-card" data-desc="A resource to support student wellbeing — mood check-ins, breathing tools, peer support links.">
-            <div class="idea-num">01</div>
-            <div class="idea-title">Mental Health</div>
-            <div class="idea-type">Resource / Wellness App</div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')">
+            <div class="idea-card-inner">
+              <div class="idea-card-front">
+                <div class="idea-num">01</div>
+                <div class="idea-title">Mental Health</div>
+                <div class="idea-type">Resource / Wellness App</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+              <div class="idea-card-back">
+                <div class="idea-type">A resource to support student wellbeing — mood check-ins, breathing tools, peer support links.</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+            </div>
           </div>
-          <div class="idea-card" data-desc="Tools that work offline or on slow connections — cached content, lightweight pages, offline-first design.">
-            <div class="idea-num">02</div>
-            <div class="idea-title">Low-Bandwidth</div>
-            <div class="idea-type">Offline-First Tool</div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')">
+            <div class="idea-card-inner">
+              <div class="idea-card-front">
+                <div class="idea-num">02</div>
+                <div class="idea-title">Low-Bandwidth</div>
+                <div class="idea-type">Offline-First Tool</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+              <div class="idea-card-back">
+                <div class="idea-type">Tools that work offline or on slow connections — cached content, lightweight pages, offline-first design.</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+            </div>
           </div>
-          <div class="idea-card" data-desc="An interactive site that teaches students how AI works — demystifying models, bias, and responsible use.">
-            <div class="idea-num">03</div>
-            <div class="idea-title">AI Literacy</div>
-            <div class="idea-type">Educational Website</div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')">
+            <div class="idea-card-inner">
+              <div class="idea-card-front">
+                <div class="idea-num">03</div>
+                <div class="idea-title">AI Literacy</div>
+                <div class="idea-type">Educational Website</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+              <div class="idea-card-back">
+                <div class="idea-type">An interactive site that teaches students how AI works — demystifying models, bias, and responsible use.</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+            </div>
           </div>
-          <div class="idea-card" data-desc="Deadline tracker with push reminders, calendar sync, and smart prioritisation — built for student brains.">
-            <div class="idea-num">04</div>
-            <div class="idea-title">Scheduling</div>
-            <div class="idea-type">Deadline / Reminder App</div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')">
+            <div class="idea-card-inner">
+              <div class="idea-card-front">
+                <div class="idea-num">04</div>
+                <div class="idea-title">Scheduling</div>
+                <div class="idea-type">Deadline / Reminder App</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+              <div class="idea-card-back">
+                <div class="idea-type">Deadline tracker with push reminders, calendar sync, and smart prioritisation — built for student brains.</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+            </div>
           </div>
-          <div class="idea-card" data-desc="Budgeting tools, spending habit trackers, and financial basics — built for students managing money for the first time.">
-            <div class="idea-num">05</div>
-            <div class="idea-title">Financial Literacy</div>
-            <div class="idea-type">Budget / Spending Tracker</div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')">
+            <div class="idea-card-inner">
+              <div class="idea-card-front">
+                <div class="idea-num">05</div>
+                <div class="idea-title">Financial Literacy</div>
+                <div class="idea-type">Budget / Spending Tracker</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+              <div class="idea-card-back">
+                <div class="idea-type">Budgeting tools, spending habit trackers, and financial basics — built for students managing money for the first time.</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+            </div>
           </div>
-          <div class="idea-card ghost" data-desc="You know ITHS better than anyone. What's broken? What's missing? That problem is your brief.">
-            <div class="idea-num">✦</div>
-            <div class="idea-title">Your Idea</div>
-            <div class="idea-type">undefined — you decide</div>
+          <div class="idea-card ghost" onclick="this.classList.toggle('flipped')">
+            <div class="idea-card-inner">
+              <div class="idea-card-front">
+                <div class="idea-num">✦</div>
+                <div class="idea-title">Your Idea</div>
+                <div class="idea-type">undefined — you decide</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+              <div class="idea-card-back">
+                <div class="idea-type">You know ITHS better than anyone. What's broken? What's missing? That problem is your brief.</div>
+                <div class="idea-card-hint">↻</div>
+              </div>
+            </div>
           </div>
         </div>
+        <div class="idea-tooltip" id="ideaTooltip"></div>
         <div class="idea-tooltip" id="ideaTooltip"></div>
 
       </section>
@@ -1545,14 +1684,14 @@
       <!-- DIVIDER -->
       <div class="section-divider">
         <hr class="divider-line">
-        <div class="divider-comment">// Section 3.1: Participants and judging</div>
+        <div class="divider-comment">// Section 3.1: Supporting details</div>
       </div>
 
       <!-- ── PARTICIPANTS & JUDGING ── -->
       <section class="section fade-in" id="participants">
         <div class="section-header">
           <div class="section-tag">03.1 &nbsp;format.ts</div>
-          <h2 class="section-title">The setup</h2>
+          <h2 class="section-title">The Setup</h2>
         </div>
 
         <div class="two-col">
@@ -1613,6 +1752,19 @@
               </li>
             </ul>
           </div>
+        </div>
+
+        <div class="idea-grid-label" style="margin-top:24px;">// prize.pending</div>
+        <div class="two-col" style="margin-top:0; display:block;">
+          <div class="info-panel">
+              <div class="info-panel-title">Prize</div>
+              <p style="font-size:13px; color:var(--text-muted); line-height:1.8; margin-bottom:20px;">Awarded to the winning team after two rounds of judging.</p>
+              <div class="prize-shimmer">
+                <div class="prize-shimmer-bar"></div>
+                <div class="prize-shimmer-bar short"></div>
+              </div>
+              <div class="prize-tba">→ To be announced</div>
+            </div>
         </div>
       </section>
 
