@@ -67,6 +67,8 @@
     z-index: 100;
     background: var(--bg3);
     border-bottom: 1px solid var(--border);
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   .titlebar {
@@ -1257,6 +1259,7 @@
     align-items: center;
     z-index: 100;
     flex-wrap: nowrap;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .statusbar-item { display: flex; align-items: center; gap: 5px; }
@@ -1297,6 +1300,7 @@
     .line-numbers, .line-numbers-fixed { display: none; }
     .section, .hero, .footer { padding-left: 24px; padding-right: 24px; }
     .section-divider { padding: 0 24px; }
+    .hero { padding-top: 40px; min-height: auto; justify-content: flex-start; }
   }
 
   @media (hover: none) {
@@ -1361,11 +1365,12 @@
 
     <div class="sb-facts">
       <div class="sb-tldr-label">TL;DR</div>
-      <div class="sb-fact"><span class="sb-fact-key">Workshops:</span><span class="sb-fact-val">Apr 14–24, 10:45–12:20</span></div>
-      <div class="sb-fact"><span class="sb-fact-key">Hackathon:</span><span class="sb-fact-val">Apr 27, 9:00–14:00</span></div>
-      <div class="sb-fact"><span class="sb-fact-key">Pitching:</span><span class="sb-fact-val">Apr 28, 9:00–12:00</span></div>
-      <div class="sb-fact"><span class="sb-fact-key">Teams:</span><span class="sb-fact-val">5–6 students, 60 total</span></div>
+      <div class="sb-fact"><span class="sb-fact-key">Workshops:</span><span class="sb-fact-val">Apr 14&ndash;24,<br>10:45&ndash;12:20</span></div>
+      <div class="sb-fact"><span class="sb-fact-key">Hackathon:</span><span class="sb-fact-val">Apr 27, 9:00&ndash;14:00</span></div>
+      <div class="sb-fact"><span class="sb-fact-key">Pitching:</span><span class="sb-fact-val">Apr 28, 9:00&ndash;12:00</span></div>
       <div class="sb-fact"><span class="sb-fact-key">Theme:</span><span class="sb-fact-val">Make ITHS Better</span></div>
+      <div class="sb-fact"><span class="sb-fact-key">Attendees:</span><span class="sb-fact-val">60 total,<br>teams of 5&ndash;6</span></div>
+      <div class="sb-fact"><span class="sb-fact-key">Prize:</span><span class="sb-fact-val">TBD</span></div>
     </div>
 
     <div class="sb-powered">
@@ -1399,7 +1404,7 @@
         <h1 class="hero-greeting">Hello, ITHS!<span class="cursor"></span></h1>
 
         <p class="hero-subtitle">
-          You're about to spend two weeks learning from real practitioners — then one day building something from scratch. The goal isn't a grade. It's a deployed product that solves a real problem for someone at ITHS. Workshops give you the tools. The hackathon is where you use them.
+          Your hackathon is approaching!<br>Familiarize yourself with the details below, and get ready to <a href="#hackathon" style="color:var(--accent); text-decoration:none;">Make ITHS Better →</a>
         </p>
 
         <div class="hero-schedule">
@@ -1429,7 +1434,7 @@
               <span class="hs-month">APR</span>
               <span class="hs-day">28</span>
             </div>
-            <div class="hs-event">Pitching & Judging<span class="hs-sub">3 min pitch + Q&A</span></div>
+            <div class="hs-event">Pitching & Judging<span class="hs-sub">3 min pitch + Q&A ·<br>Finalists advance to a second round</span></div>
             <div class="hs-time">9:00&dash;12:00</div>
           </div>
         </div>
@@ -1448,7 +1453,7 @@
           <div class="section-tag">02 &nbsp;workshops.json</div>
           <h2 class="section-title">The Schedule</h2>
           <p class="section-desc">
-            Five sessions, each <strong style="color:var(--text)">10:45–12:20</strong>, led by a practitioner from the field.
+            Six sessions, led by experts in their respective fields, covering unique topics to help you prepare for the hackathon (and think bigger beyond it).
           </p>
         </div>
 
@@ -1466,7 +1471,7 @@
               <div class="workshop-date">Tuesday, April 14</div>
               <div class="workshop-title">Luis Muñoz</div>
               <div class="workshop-speaker">AI</div>
-              <div class="workshop-desc">LLMs, prompt engineering, and integrating AI APIs — hands-on with real tools.</div>
+              <div class="workshop-desc">Founder & CEO, LCube Studios and Hodie Et Nunc</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
             </div>
           </div>
@@ -1481,7 +1486,7 @@
               <div class="workshop-date">Thursday, April 16</div>
               <div class="workshop-title">Imran Zafar</div>
               <div class="workshop-speaker">AI</div>
-              <div class="workshop-desc">[Fill]</div>
+              <div class="workshop-desc">Managing Director & Global Head of Data Services, S&P Global</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
           
               <hr class="workshop-inner-divider">
@@ -1494,7 +1499,7 @@
                   <div class="workshop-date">Thursday, April 16</div>
                   <div class="workshop-title">Sudeep Kesh</div>
                   <div class="workshop-speaker">AI</div>
-                  <div class="workshop-desc">[Fill]</div>
+                  <div class="workshop-desc">Chief Innovation Officer, S&P Global</div>
                   <div class="workshop-time">10:45&ndash;12:20</div>
                 </div>
               </div>
@@ -1511,7 +1516,7 @@
               <div class="workshop-date">Friday, April 17</div>
               <div class="workshop-title">Jason Jerez</div>
               <div class="workshop-speaker">UI/UX</div>
-              <div class="workshop-desc">Design principles, user flows, and Figma prototyping — why good design is how things work, not how they look.</div>
+              <div class="workshop-desc">Freelance Web Developer and Designer</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
             </div>
           </div>
@@ -1526,7 +1531,7 @@
               <div class="workshop-date">Monday, April 20</div>
               <div class="workshop-title">Yoshihiro Olson</div>
               <div class="workshop-speaker">Backend</div>
-              <div class="workshop-desc">REST APIs, databases, and auth — build a small API from scratch and understand how data actually flows.</div>
+              <div class="workshop-desc">Senior Software Engineer, DoorDash</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
             </div>
           </div>
@@ -1541,7 +1546,7 @@
               <div class="workshop-date">Wednesday, April 22</div>
               <div class="workshop-title">Aaron Alexander</div>
               <div class="workshop-speaker">Full Stack</div>
-              <div class="workshop-desc">Connect frontend to backend, manage state, and deploy — the full picture of how products ship.</div>
+              <div class="workshop-desc">Senior Software Engineer, Valon</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
             </div>
           </div>
@@ -1554,7 +1559,7 @@
               <div class="workshop-date">Friday, April 24</div>
               <div class="workshop-title">Shekhar Kapoor</div>
               <div class="workshop-speaker">Pitching</div>
-              <div class="workshop-desc">Structure a 3-minute pitch, run a live demo, and field judge questions — then practice before the real thing.</div>
+              <div class="workshop-desc">Head of Automation Solutions, S&P Global</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
             </div>
           </div>
@@ -1574,7 +1579,7 @@
         <div class="hackathon-banner">
           <div class="section-tag">03 &nbsp;hackathon.config</div>
           <h2 class="section-title">Make <span class="accent">ITHS</span> Better</h2>
-          <p class="section-desc">Identify a real problem at your school and build a solution. Deploy it. Demo it. The one rule: someone at ITHS has to genuinely benefit from it.</p>
+          <p class="section-desc">Identify a real problem at your school and build a solution for it.</p>
           <div class="hackathon-pills" style="margin-top:20px;">
             <div class="hk-pill"><span class="hk-pill-dot" style="background:#e6edf3"></span>Deploy via GitHub Pages</div>
             <div class="hk-pill"><span class="hk-pill-dot" style="background:#e6edf3"></span>AI use required</div>
@@ -1588,14 +1593,14 @@
             <div class="day-card-num">Monday, April 27</div>
             <div class="day-card-title">Day 1: Build</div>
             <div class="day-card-meta">9:00&ndash;14:00</div>
-            <div class="day-card-desc">Build your MVP. Ship something a judge can open and interact with. This is the day everything from the workshops comes together.</div>
+            <div class="day-card-desc">Form groups, split into three judging rooms, and build your MVP&mdash;something the judges can launch and interact with on the day.</div>
           </div>
           <div class="day-card-arrow-col">→</div>
           <div class="day-card day-card-2">
             <div class="day-card-num">Tuesday, April 28</div>
             <div class="day-card-title">Day 2: Pitch & Judge</div>
             <div class="day-card-meta">9:00&ndash;12:00</div>
-            <div class="day-card-desc">3 minutes to present, 2 minutes Q&A. Judges will try your product live. Top 3 teams present to the full room.</div>
+            <div class="day-card-desc">Three minutes to pitch, two minutes for Q&A. (The top team from each room advances to a final round.)</div>
           </div>
         </div>
 
@@ -1607,11 +1612,11 @@
               <div class="idea-card-front">
                 <div class="idea-num">01</div>
                 <div class="idea-title">Mental Health</div>
-                <div class="idea-type">Resource / Wellness App</div>
+                <div class="idea-type">Resource/Wellness App</div>
                 <div class="idea-card-hint">↻</div>
               </div>
               <div class="idea-card-back">
-                <div class="idea-type">A resource to support student wellbeing — mood check-ins, breathing tools, peer support links.</div>
+                <div class="idea-type">A tool to support student wellbeing: mood check-ins, peer support, or mental health resources.</div>
                 <div class="idea-card-hint">↻</div>
               </div>
             </div>
@@ -1625,7 +1630,7 @@
                 <div class="idea-card-hint">↻</div>
               </div>
               <div class="idea-card-back">
-                <div class="idea-type">Tools that work offline or on slow connections — cached content, lightweight pages, offline-first design.</div>
+                <div class="idea-type">A lightweight resource that works on slow WiFi: cached content, fast load times, accessible to everyone.</div>
                 <div class="idea-card-hint">↻</div>
               </div>
             </div>
@@ -1639,7 +1644,7 @@
                 <div class="idea-card-hint">↻</div>
               </div>
               <div class="idea-card-back">
-                <div class="idea-type">An interactive site that teaches students how AI works — demystifying models, bias, and responsible use.</div>
+                <div class="idea-type">Help users understand how AI actually works&emdash;the models, the bias, responsible use.</div>
                 <div class="idea-card-hint">↻</div>
               </div>
             </div>
@@ -1649,11 +1654,11 @@
               <div class="idea-card-front">
                 <div class="idea-num">04</div>
                 <div class="idea-title">Scheduling</div>
-                <div class="idea-type">Deadline / Reminder App</div>
+                <div class="idea-type">Deadline/Reminder App</div>
                 <div class="idea-card-hint">↻</div>
               </div>
               <div class="idea-card-back">
-                <div class="idea-type">Deadline tracker with push reminders, calendar sync, and smart prioritisation — built for student brains.</div>
+                <div class="idea-type">A smarter way to manage deadlines, reminders, and priorities; built around how students actually work.</div>
                 <div class="idea-card-hint">↻</div>
               </div>
             </div>
@@ -1663,11 +1668,11 @@
               <div class="idea-card-front">
                 <div class="idea-num">05</div>
                 <div class="idea-title">Financial Literacy</div>
-                <div class="idea-type">Budget / Spending Tracker</div>
+                <div class="idea-type">Budget/Spending Tracker</div>
                 <div class="idea-card-hint">↻</div>
               </div>
               <div class="idea-card-back">
-                <div class="idea-type">Budgeting tools, spending habit trackers, and financial basics — built for students managing money for the first time.</div>
+                <div class="idea-type">Practical tools for students managing money for the first time: budgeting, spending habits, financial basics.</div>
                 <div class="idea-card-hint">↻</div>
               </div>
             </div>
@@ -1677,11 +1682,11 @@
               <div class="idea-card-front">
                 <div class="idea-num">✦</div>
                 <div class="idea-title">Your Idea</div>
-                <div class="idea-type">undefined — you decide</div>
+                <div class="idea-type"><em>// Undefined</em></div>
                 <div class="idea-card-hint">↻</div>
               </div>
               <div class="idea-card-back">
-                <div class="idea-type">You know ITHS better than anyone. What's broken? What's missing? That problem is your brief.</div>
+                <div class="idea-type">You know ITHS better than anyone. What's broken? What's missing? You decide.</div>
                 <div class="idea-card-hint">↻</div>
               </div>
             </div>
@@ -1707,7 +1712,7 @@
 
         <div class="two-col">
           <div class="info-panel">
-            <div class="info-panel-title">Participants</div>
+            <div class="info-panel-title">Attendees</div>
             <div class="big-number">60</div>
             <div class="stat-row">
               <span class="stat-label">Grades</span>
@@ -1730,35 +1735,35 @@
                 <div class="criteria-num">01</div>
                 <div class="criteria-text">
                   <strong>Impact & Relevance</strong>
-                  Does this solve a real problem at ITHS? Would people actually use it?
+                  Are your solution solving a real ITHS problem, with high potential to make a positive impact?
                 </div>
               </li>
               <li class="criteria-item">
                 <div class="criteria-num">02</div>
                 <div class="criteria-text">
-                  <strong>Technical Execution</strong>
-                  Is the code working? Is the architecture sensible? Does the demo run?
+                  <strong>AI Implementation</strong>
+                  Does AI play a meaningful role in your solution, or is it just decorative?
                 </div>
               </li>
               <li class="criteria-item">
                 <div class="criteria-num">03</div>
                 <div class="criteria-text">
-                  <strong>Design & Usability</strong>
-                  Is the interface clear and intuitive? Does it respect the user?
+                  <strong>Technical Execution</strong>
+                  Is the frontend polished and the backend reliable? And are they working together?
                 </div>
               </li>
               <li class="criteria-item">
                 <div class="criteria-num">04</div>
                 <div class="criteria-text">
                   <strong>Pitch & Presentation</strong>
-                  Is the problem clearly framed? Is the solution well communicated?
+                  Is your problem clearly framed, and the demo live and showcased within 3 minutes?
                 </div>
               </li>
               <li class="criteria-item">
                 <div class="criteria-num">05</div>
                 <div class="criteria-text">
-                  <strong>Creativity & Ambition</strong>
-                  Does the project surprise us? Did the team stretch beyond the obvious?
+                  <strong>Code Quality</strong>
+                  Is your code efficient, modular, and readable?
                 </div>
               </li>
             </ul>
@@ -1774,7 +1779,7 @@
                 <div class="prize-shimmer-bar"></div>
                 <div class="prize-shimmer-bar short"></div>
               </div>
-              <div class="prize-tba">→ To be announced</div>
+              <div class="prize-tba">→ To be determined</div>
             </div>
         </div>
       </section>
