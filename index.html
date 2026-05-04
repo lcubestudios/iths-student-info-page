@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
+    --chrome-h: 43px;
     --bg: #0d1117;
     --bg2: #161b22;
     --bg3: #1c2128;
@@ -22,15 +23,13 @@
     --accent3: #58a6ff;
     --accent4: #58a6ff;
     --accent5: #58a6ff;
-    --gutter: #1c2128;
     --line-num: #484f58;
-    --selection: rgba(88, 166, 255, 0.1);
+    --selection: rgba(88,166,255,0.1);
     --tab-active: #0d1117;
     --tab-inactive: #161b22;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   html { scroll-behavior: smooth; }
 
   body {
@@ -42,62 +41,39 @@
     overflow-x: hidden;
   }
 
-  /* ── IDE elements: JetBrains Mono ── */
-  .tab, .window-title, .titlebar,
-  .ln, .statusbar, .statusbar-item,
-  .comment, .comment-block,
-  .keyword, .fn-name, .string, .number, .operator,
+  .tab, .window-title, .titlebar, .ln, .statusbar, .statusbar-item,
+  .comment, .keyword, .fn-name, .string, .number, .operator,
   .type, .param, .variable, .property, .punctuation,
   .code-line, .section-tag, .divider-comment,
   .sb-tldr-label, .sb-fact, .sb-fact-key, .sb-fact-val, .sb-powered,
   .terminal, .terminal-body, .terminal-title,
   .t-line, .t-prompt, .t-cmd, .t-out, .t-success, .t-warn,
-  .mindmap-label, .mm-tooltip,
   .workshop-date, .workshop-time, .workshop-speaker,
-  .hs-month, .hs-time, .hs-sub,
-  .criteria-num, .day-info, .day-action,
-  .ai-req-label, .section-tag {
+  .hs-month, .hs-time, .hs-sub, .criteria-num {
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* ─── WINDOW CHROME ─── */
+  /* ─── CHROME (titlebar only) ─── */
   .window-chrome {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
     background: var(--bg3);
     border-bottom: 1px solid var(--border);
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
   }
-
   .titlebar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex; align-items: center; gap: 8px;
     padding: 10px 16px;
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
   }
-
   .dots { display: flex; gap: 6px; }
-  .dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-  }
-  .dot-red { background: #ff5f57; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red    { background: #ff5f57; }
   .dot-yellow { background: #ffbd2e; }
-  .dot-green { background: #28c840; }
+  .dot-green  { background: #28c840; }
+  .window-title { flex: 1; text-align: center; color: var(--text); font-size: 12px; letter-spacing: .02em; }
 
-  .window-title {
-    flex: 1;
-    text-align: center;
-    color: var(--text);
-    font-size: 12px;
-    letter-spacing: 0.02em;
-  }
-
-  .tabs {
+  /* ─── SHARED TAB BAR ─── */
+  .pane-tabs {
     display: flex;
     align-items: stretch;
     background: var(--tab-inactive);
@@ -105,1199 +81,476 @@
     overflow-x: auto;
     scrollbar-width: none;
   }
-  .tabs::-webkit-scrollbar { display: none; }
+  .pane-tabs::-webkit-scrollbar { display: none; }
 
   .tab {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex; align-items: center;
     padding: 8px 18px;
-    font-size: 12px;
-    color: var(--text-dim);
+    font-size: 12px; color: var(--text-dim);
     border-right: 1px solid var(--border);
-    white-space: nowrap;
-    cursor: pointer;
-    transition: color 0.15s;
-    text-decoration: none;
+    white-space: nowrap; cursor: pointer;
+    transition: color .15s; text-decoration: none;
   }
-  .tab.active {
-    background: var(--tab-active);
-    color: var(--text);
-    border-bottom: 2px solid var(--accent);
-    margin-bottom: -1px;
-  }
+  .tab.active { background: var(--tab-active); color: var(--text); border-bottom: 2px solid var(--accent); margin-bottom: -1px; }
   .tab:hover:not(.active) { color: var(--text-muted); }
-  .tab-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); opacity: 0; }
-  .tab.modified .tab-dot { opacity: 1; }
+  .tab.winner-tab        { color: var(--text-dim); }
+  .tab.winner-tab.active { border-bottom-color: var(--accent); color: var(--text); }
 
-  .tab-icon { font-size: 11px; }
-
-  /* ─── LAYOUT ─── */
+  /* ─── IDE LAYOUT ─── */
   .ide-layout {
     display: flex;
-    margin-top: 70px; /* chrome height */
-    min-height: calc(100vh - 70px);
+    margin-top: var(--chrome-h);
+    min-height: calc(100vh - var(--chrome-h));
   }
 
   /* ─── SIDEBAR ─── */
   .sidebar {
-    width: 240px;
-    flex-shrink: 0;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    position: sticky;
-    top: 70px;
-    height: calc(100vh - 70px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-    display: flex;
-    flex-direction: column;
+    width: 240px; flex-shrink: 0;
+    background: var(--bg2); border-right: 1px solid var(--border);
+    position: sticky; top: var(--chrome-h);
+    height: calc(100vh - var(--chrome-h));
+    overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    display: flex; flex-direction: column;
   }
-
-  /* ── Identity block ── */
-  .sb-identity {
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sb-logo {
-    width: 44px; height: 44px;
-    border-radius: 8px;
-    background: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-weight: 800;
-    font-size: 16px;
-    color: #000;
-    margin-bottom: 14px;
-    letter-spacing: -0.02em;
-  }
-
-  .sb-event-name {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1.3;
-    margin-bottom: 6px;
-  }
-
-  .sb-tagline {
-    font-size: 11px;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-
-  /* ── Quick facts / TL;DR ── */
-  .sb-facts {
-    padding: 30px 20px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .sb-facts { padding: 30px 20px 20px; border-bottom: 1px solid var(--border); }
   .sb-tldr-label {
-    font-size: 13px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text);
-    font-weight: 700;
+    font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text); font-weight: 700;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    margin-bottom: 6px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 6px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
   }
-
-  .sb-fact {
-    display: flex;
-    gap: 0;
-    padding: 8px 0;
-    font-size: 11px;
-    line-height: 1.5;
-    border-bottom: 1px solid var(--border);
-  }
+  .sb-fact { display: flex; padding: 8px 0; font-size: 11px; line-height: 1.5; border-bottom: 1px solid var(--border); }
   .sb-fact:last-child { border-bottom: none; }
-  .sb-fact-key {
-    color: var(--accent);
-    flex-shrink: 0;
-    width: 78px;
-    font-weight: 500;
-  }
+  .sb-fact-key { color: var(--accent); flex-shrink: 0; width: 78px; font-weight: 500; }
   .sb-fact-val { color: var(--text-muted); }
-
-  .sb-powered {
-    margin-top: auto;
-    padding: 16px 20px 40px;
-    font-size: 10px;
-    color: var(--text-dim);
-    border-top: 1px solid var(--border);
-    letter-spacing: 0.02em;
-  }
+  .sb-powered { margin-top: auto; padding: 16px 20px 40px; font-size: 10px; color: var(--text-dim); border-top: 1px solid var(--border); letter-spacing: .02em; }
   .sb-powered strong { color: var(--text-muted); font-weight: 500; }
 
-  /* ─── WORKSHOP ROW ─── */
-  .workshop-item { cursor: default; }
-  .workshop-desc {
-    font-size: 12px;
-    color: var(--text-dim);
-    line-height: 1.7;
-    margin-top: 4px;
-  }
+  /* ─── EDITOR ─── */
+  .editor { flex: 1; min-width: 0; display: flex; }
 
-  .workshop-dot-col {
-    margin-top: 30px;
-  }
-
-  /* ─── TERMINAL FOOTER ─── */
-  .terminal {
-    margin: 60px 60px 0;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .terminal-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 14px;
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
-  }
-  .terminal-bar .dots { gap: 5px; }
-  .terminal-bar .dot { width: 10px; height: 10px; }
-  .terminal-title {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-left: 6px;
-  }
-
-  .terminal-body {
-    padding: 20px 24px 24px;
-    font-size: 12px;
-    line-height: 2;
-    min-height: 140px;
-  }
-
-  .t-line { display: block; }
-  .t-prompt { color: #3fb950; }          /* green — shell prompt */
-  .t-cmd { color: #e6edf3; }             /* white — typed command */
-  .t-out { color: #656d76; }             /* dim grey — stdout */
-  .t-success { color: #3fb950; }         /* green — ✓ pass */
-  .t-warn { color: #ffcb05; }            /* yellow — → notice */
-  .t-cursor {
-    display: inline-block;
-    width: 7px; height: 13px;
-    background: #e6edf3;
-    vertical-align: text-bottom;
-    margin-left: 2px;
-    animation: blink 1s step-end infinite;
-  }
-
-
-  .editor {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-  }
-
-  .line-numbers {
-    width: 52px;
-    flex-shrink: 0;
-    /* placeholder so the editor flex layout still reserves space */
-  }
+  .line-numbers { width: 52px; flex-shrink: 0; }
 
   .line-numbers-fixed {
     position: fixed;
-    top: 70px;
-    /* left is set by JS once sidebar width is known */
+    top: var(--chrome-h);
     width: 52px;
-    height: calc(100vh - 70px);
-    background: var(--bg);
-    border-right: 1px solid var(--border);
-    overflow: hidden;
-    user-select: none;
-    z-index: 10;
+    height: calc(100vh - var(--chrome-h));
+    background: var(--bg); border-right: 1px solid var(--border);
+    overflow: hidden; user-select: none; z-index: 10;
+  }
+  .line-numbers-inner { will-change: transform; text-align: right; }
+  .ln { display: block; color: var(--line-num); font-size: 12px; line-height: 1.7; padding: 0 10px 0 4px; }
+
+  .content { flex: 1; min-width: 0; padding: 0 0 48px; }
+
+  /* ─── WINNER SECTION (top "pane") ─── */
+  .winner-section { border-bottom: 2px solid var(--accent); }
+
+  .winner-content-inner { padding: 32px 60px 40px; max-width: 600px; }
+
+  .winner-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .winner-eyebrow::after { content: ''; flex: 1; max-width: 60px; height: 1px; background: var(--accent); opacity: .4; }
+
+  .winner-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+
+  .winner-project-name {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: clamp(28px, 4vw, 52px); font-weight: 800; color: var(--text);
+    letter-spacing: -.02em; line-height: 1; margin-bottom: 10px;
   }
 
-  .line-numbers-inner {
-    /* translateY is driven by JS on scroll */
-    will-change: transform;
-    padding-top: 48px;
-    text-align: right;
-  }
+  .winner-project-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
 
-  .ln {
+  /* Demo CTA */
+  .winner-demo-block { margin-bottom: 24px; }
+  .winner-cta-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 700;
+    padding: 11px 22px; border-radius: 4px;
+    text-decoration: none; letter-spacing: .02em;
+    transition: opacity .15s, transform .15s;
+    margin-bottom: 10px; display: inline-flex;
+  }
+  .winner-cta-btn:hover { opacity: .88; transform: translateY(-2px); }
+  .winner-demo-note { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); font-style: italic; line-height: 1.8; }
+
+  /* Team box */
+  .winner-block {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 24px 28px;
+    display: block; width: 100%;
+  }
+  .winner-block-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+  .winner-members { list-style: none; }
+  .winner-member { font-size: 12px; color: var(--text); padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .winner-member::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .winner-member:last-child { border-bottom: none; }
+
+  /* ─── FEEDBACK FORM ─── */
+  .feedback-form-wrap { }
+  .feedback-header { margin-bottom: 28px; }
+  .feedback-form { max-width: 600px; }
+  .form-group { margin-bottom: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 900px) { .form-row { grid-template-columns: 1fr; } }
+
+  .feedback-form label {
     display: block;
-    color: var(--line-num);
-    font-size: 12px;
-    line-height: 1.7;
-    padding: 0 10px 0 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
   }
 
-  .content {
+  .feedback-form input[type="text"],
+  .feedback-form input[type="email"],
+  .feedback-form input[type="number"],
+  .feedback-form textarea,
+  .feedback-form select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+    transition: border-color .15s, background .15s;
+    box-sizing: border-box;
+  }
+
+  .feedback-form input::placeholder,
+  .feedback-form textarea::placeholder {
+    color: var(--text-dim);
+  }
+
+  .feedback-form input:focus,
+  .feedback-form textarea:focus,
+  .feedback-form select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg);
+  }
+
+  .feedback-form input.error {
+    border-color: var(--accent);
+    background: var(--bg);
+    box-shadow: 0 0 8px rgba(255, 203, 5, 0.3);
+  }
+
+  .feedback-form textarea { resize: vertical; min-height: 80px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+
+  .feedback-form select {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238b949e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+  }
+
+  .feedback-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 11px 22px;
+    border-radius: 4px;
+    border: none;
+    text-decoration: none;
+    letter-spacing: .02em;
+    transition: opacity .15s, transform .15s, box-shadow .15s;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .feedback-submit-btn:hover:not(:disabled) {
+    opacity: .88;
+    transform: translateY(-2px);
+  }
+
+  .feedback-submit-btn:active:not(:disabled) { transform: translateY(0); }
+
+  .feedback-submit-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    box-shadow: 0 0 12px rgba(255, 203, 5, 0.4);
+  }
+
+  .feedback-success {
+    padding: 32px 0;
+    text-align: center;
+  }
+
+  .success-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .success-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .success-text { }
+  .success-title { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 400px; }
+
+  .rating-dots { width: 100%; }
+  .dots-container {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .dot-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
     flex: 1;
-    min-width: 0;
-    padding: 0 0 48px;
+  }
+  .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    flex-shrink: 0;
+  }
+  .dot:hover { background: var(--border-bright); transform: scale(1.3); }
+  .dot.active { background: var(--accent); }
+  .dot.preview { background: var(--accent); opacity: .6; }
+  .dot-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: .05em;
+  }
+
+  .form-error {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #ff5f57;
+    margin-top: 6px;
+    display: block;
+    line-height: 1.4;
+  }
+
+  /* ─── PANE DIVIDER (static visual) ─── */
+  .pane-divider {
+    height: 6px;
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
 
   /* ─── SECTIONS ─── */
-  .section {
-    padding: 60px 60px 0;
-    position: relative;
-  }
-
-  .section + .section {
-    padding-top: 60px;
-  }
+  .section { padding: 60px 60px 0; position: relative; }
+  .section + .section { padding-top: 60px; }
 
   /* ─── HERO ─── */
   .hero {
     padding: 60px 60px 0;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: flex; flex-direction: column; justify-content: center;
     position: relative;
   }
-
   .hero::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: 
-      radial-gradient(ellipse 60% 50% at 20% 40%, rgba(88,166,255,0.05) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 80% 70%, rgba(63,185,80,0.04) 0%, transparent 60%);
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 40%, rgba(88,166,255,.05) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 80% 70%, rgba(63,185,80,.04) 0%, transparent 60%);
     pointer-events: none;
   }
 
-  .comment {
-    color: var(--text-dim);
-    font-style: italic;
-    margin-bottom: 4px;
-  }
+  .comment { color: var(--text-dim); font-style: italic; margin-bottom: 4px; }
   .comment-block { margin-bottom: 32px; }
-
-  .keyword { color: var(--accent3); }
-  .fn-name { color: var(--accent); }
-  .string { color: var(--accent2); }
-  .number { color: var(--accent4); }
-  .operator { color: var(--text-muted); }
-  .type { color: var(--accent4); }
-  .param { color: var(--accent5); }
-  .variable { color: var(--text); }
-  .property { color: var(--accent3); }
+  .keyword   { color: var(--accent3); }
+  .fn-name   { color: var(--accent); }
+  .string    { color: var(--accent2); }
+  .number    { color: var(--accent4); }
+  .operator  { color: var(--text-muted); }
+  .type      { color: var(--accent4); }
+  .param     { color: var(--accent5); }
+  .variable  { color: var(--text); }
+  .property  { color: var(--accent3); }
   .punctuation { color: var(--text-dim); }
 
   .hero-greeting {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: clamp(48px, 8vw, 96px);
-    font-weight: 800;
-    line-height: 1;
-    color: var(--text);
-    margin-bottom: 16px;
-    letter-spacing: -0.02em;
+    font-size: clamp(48px, 8vw, 96px); font-weight: 800; line-height: 1;
+    color: var(--text); margin-bottom: 16px; letter-spacing: -.02em;
   }
-
   .hero-greeting .cursor {
-    display: inline-block;
-    width: 4px;
-    height: 0.75em;
-    background: var(--accent);
-    vertical-align: baseline;
-    margin-left: 6px;
-    animation: blink 1.2s step-end infinite;
+    display: inline-block; width: 4px; height: .75em; background: var(--accent);
+    vertical-align: baseline; margin-left: 6px; animation: blink 1.2s step-end infinite;
   }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
   .hero-subtitle {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: clamp(18px, 2.5vw, 24px);
-    font-weight: 400;
-    color: var(--text-muted);
-    margin-bottom: 48px;
-    max-width: 600px;
+    font-size: clamp(18px, 2.5vw, 24px); font-weight: 400;
+    color: var(--text-muted); margin-bottom: 48px; max-width: 600px;
   }
 
-  .hero-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 48px;
-  }
-
-  .meta-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px 14px;
-    font-size: 12px;
-    color: var(--text-muted);
-    transition: border-color 0.2s, color 0.2s;
-  }
-  .meta-badge:hover { border-color: var(--accent); color: var(--text); }
-  .meta-badge .badge-icon { font-size: 14px; }
-  .meta-badge strong { color: var(--text); }
-
-  /* ─── HERO SCHEDULE TABLE ─── */
-  .hero-schedule {
-    margin-bottom: 20px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    max-width: 560px;
-  }
-
-  .hs-row {
-    display: grid;
-    grid-template-columns: 100px 1fr 120px;
-    align-items: center;
-    gap: 0 20px;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-  }
+  /* ─── HERO SCHEDULE ─── */
+  .hero-schedule { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; max-width: 560px; }
+  .hs-row { display: grid; grid-template-columns: 100px 1fr 120px; align-items: center; gap: 0 20px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
   .hs-row:last-child { border-bottom: none; }
-
-  .hs-header {
-    background: var(--bg3);
-    padding: 9px 20px;
-  }
-  .hs-header span {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    font-weight: 400;
-  }
-
-  .hs-date {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .hs-month {
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .hs-day {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-  }
-  .hs-extra {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-  }
-
-  .hs-event {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-  }
-  .hs-sub {
-    display: block;
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-top: 3px;
-    font-weight: 400;
-  }
-
-  .hs-time {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: left;
-  }
-
-  .hero-code-block {
-    margin-top: 60px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    max-width: 640px;
-  }
-
-  .code-block-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
-  }
-  .code-block-header span {
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-  .code-block-header .cb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-bright); }
-
-  .code-block-body {
-    padding: 20px 24px;
-    line-height: 2;
-  }
-
-  .code-line { display: block; }
-  .indent { display: inline-block; width: 2em; }
-  .indent2 { display: inline-block; width: 4em; }
+  .hs-header { background: var(--bg3); padding: 9px 20px; }
+  .hs-header span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); font-weight: 400; }
+  .hs-date  { display: flex; align-items: center; gap: 5px; }
+  .hs-month { font-size: 10px; color: var(--text-dim); letter-spacing: .05em; text-transform: uppercase; }
+  .hs-day   { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1; }
+  .hs-event { font-size: 13px; font-weight: 500; color: var(--text); }
+  .hs-sub   { display: block; font-size: 11px; color: var(--text-dim); margin-top: 3px; font-weight: 400; }
+  .hs-time  { font-size: 11px; color: var(--text-muted); text-align: left; }
 
   /* ─── SECTION HEADERS ─── */
-  .section-header {
-    margin-bottom: 40px;
-  }
-
+  .section-header { margin-bottom: 40px; }
   .section-tag {
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
   }
-  .section-tag::after {
-    content: '';
-    flex: 1;
-    max-width: 80px;
-    height: 1px;
-    background: var(--accent);
-    opacity: 0.4;
-  }
-
-  .section-title {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: clamp(28px, 4vw, 42px);
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-  }
-
-  .section-desc {
-    margin-top: 12px;
-    color: var(--text-muted);
-    font-size: 13px;
-    max-width: 580px;
-    line-height: 1.8;
-  }
-
-  /* ─── EXPECT TABLE ─── */
-  .expect-table {
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    font-size: 12px;
-    margin-top: 32px;
-  }
-
-  .et-row {
-    display: grid;
-    grid-template-columns: 160px 1fr 120px;
-    align-items: center;
-    gap: 20px;
-    padding: 13px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .et-row:last-child { border-bottom: none; }
-  .et-row.et-header {
-    background: var(--bg3);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    padding: 8px 20px;
-  }
-  .et-row:not(.et-header):hover { background: var(--bg2); }
-
-  .et-topic {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: var(--text);
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 13px;
-  }
-  .et-icon { font-size: 14px; flex-shrink: 0; }
-  .et-desc { color: var(--text-muted); line-height: 1.5; }
-  .et-tags { display: flex; gap: 5px; flex-wrap: wrap; }
-
-  .tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 2px;
-    letter-spacing: 0.05em;
-    font-weight: 500;
-  }
-  .tag-blue { background: rgba(88,166,255,0.12); color: var(--accent); border: 1px solid rgba(88,166,255,0.2); }
-  .tag-green { background: rgba(63,185,80,0.12); color: var(--accent2); border: 1px solid rgba(63,185,80,0.2); }
-  .tag-purple { background: rgba(210,168,255,0.12); color: var(--accent3); border: 1px solid rgba(210,168,255,0.2); }
-  .tag-orange { background: rgba(255,166,87,0.12); color: var(--accent4); border: 1px solid rgba(255,166,87,0.2); }
-  .tag-red { background: rgba(255,123,114,0.12); color: var(--accent5); border: 1px solid rgba(255,123,114,0.2); }
+  .section-tag::after { content: ''; flex: 1; max-width: 80px; height: 1px; background: var(--accent); opacity: .4; }
+  .section-title { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: clamp(28px,4vw,42px); font-weight: 800; color: var(--text); letter-spacing: -.02em; line-height: 1.1; }
+  .section-desc { margin-top: 12px; color: var(--text-muted); font-size: 13px; max-width: 580px; line-height: 1.8; }
 
   /* ─── TIMELINE / WORKSHOPS ─── */
-  .timeline {
-    margin-top: 32px;
-    position: relative;
-  }
-
-  .timeline-spine {
-    position: absolute;
-    left: 31px;
-    top: 42px;
-    bottom: 42px;
-    width: 1px;
-    background: var(--border);
-  }
-
-  .workshop-item {
-    display: flex;
-    gap: 28px;
-    align-items: flex-start;
-    margin-bottom: 0;
-    position: relative;
-  }
-
-  .workshop-item + .workshop-item {
-    border-top: 1px solid var(--border);
-  }
-    width: 76px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 44px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Per-workshop accent ring on avatar */
-  .av-ai    { border-color: var(--accent3); color: var(--accent3); }
-  .av-uiux  { border-color: var(--accent);  color: var(--accent);  }
-  .av-back  { border-color: var(--accent2); color: var(--accent2); }
-  .av-full  { border-color: var(--accent4); color: var(--accent4); }
-  .av-pitch { border-color: var(--accent5); color: var(--accent5); }
-
-
-  .workshop-avatar {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: var(--bg3);
-    border: 2px solid var(--border-bright);
-    overflow: hidden;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
+  .timeline { margin-top: 32px; position: relative; }
+  .timeline-spine { position: absolute; left: 31px; top: 42px; bottom: 42px; width: 1px; background: var(--border); }
+  .workshop-item { display: flex; gap: 28px; align-items: flex-start; position: relative; cursor: default; }
+  .workshop-item + .workshop-item { border-top: 1px solid var(--border); }
+  .workshop-dot-col { margin-top: 30px; width: 76px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding-top: 44px; position: relative; z-index: 1; }
+  .workshop-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--bg3); border: 2px solid var(--border-bright); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--text-muted); letter-spacing: .04em; text-transform: uppercase; }
   .workshop-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   a.workshop-avatar { text-decoration: none; cursor: pointer; }
-  a.workshop-avatar:hover { opacity: 0.85; }
-
-  .workshop-inner-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 28px 0;
-  width: 60%;
-  }  
-  /* Remove per-workshop colour classes */
-  .av-ai, .av-uiux, .av-back, .av-full, .av-pitch {
-    border-color: var(--border-bright);
-    color: var(--text-muted);
-  }
-
-  .workshop-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    border: 2px solid var(--bg);
-    flex-shrink: 0;
-  }
-
-  .ai-requirement {
-    font-size: 12px;
-    color: var(--text-muted);
-    background: rgba(210,168,255,0.06);
-    border: 1px solid rgba(210,168,255,0.2);
-    border-radius: 4px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-    line-height: 1.6;
-    max-width: 580px;
-  }
-  .ai-req-label {
-    display: block;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent3);
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-
-  .workshop-inner {
-    flex: 1;
-    padding: 28px 24px 28px 0;
-    transition: background 0.15s;
-  }
-
-  .workshop-date {
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-  }
-
-  .workshop-title {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-
-  .workshop-speaker {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-  }
-
-  .workshop-desc {
-    font-size: 12px;
-    color: var(--text-dim);
-    line-height: 1.7;
-  }
-
-  .workshop-time {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-top: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  /* ─── SPEAKERS ─── */
-  .speakers-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    margin-top: 32px;
-  }
-
-  .speaker-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 20px;
-    transition: border-color 0.2s, transform 0.2s;
-  }
-  .speaker-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-
-  .speaker-avatar {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: var(--bg3);
-    border: 2px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    margin-bottom: 12px;
-  }
-
-  .speaker-name {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .speaker-role {
-    font-size: 11px;
-    color: var(--text-dim);
-    line-height: 1.5;
-  }
-
-  .speaker-topic {
-    margin-top: 10px;
-    font-size: 10px;
-  }
+  a.workshop-avatar:hover { opacity: .85; }
+  .av-ai, .av-uiux, .av-back, .av-full, .av-pitch { border-color: var(--border-bright); color: var(--text-muted); }
+  .workshop-inner-divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; width: 60%; }
+  .workshop-inner { flex: 1; padding: 28px 24px 28px 0; }
+  .workshop-date    { font-size: 11px; color: var(--text-dim); letter-spacing: .05em; margin-bottom: 6px; }
+  .workshop-title   { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .workshop-speaker { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .workshop-desc    { font-size: 12px; color: var(--text-dim); line-height: 1.7; margin-top: 4px; }
+  .workshop-time    { font-size: 11px; color: var(--text-dim); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
 
   /* ─── HACKATHON ─── */
-  .hackathon-banner {
-    margin-bottom: 28px;
-  }
-
-  .hackathon-theme-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 10px;
-  }
-
-  .hackathon-theme {
-    font-size: clamp(28px, 4vw, 48px);
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: 16px;
-  }
-  .hackathon-theme .accent { color: var(--accent2); }
-
-  .hackathon-body {
-    font-size: 13px;
-    color: var(--text-muted);
-    max-width: 600px;
-    line-height: 1.8;
-    margin-bottom: 20px;
-  }
-
-  .hackathon-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .hk-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 14px;
-    border: 1px solid var(--border-bright);
-    border-radius: 20px;
-    font-size: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-muted);
-  }
-
-  .hk-pill-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* Day cards */
-  .hackathon-days-grid {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    margin-bottom: 20px;
-  }
-
-  .day-card {
-    flex: 1 1 0;
-    min-width: 0;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-top: 2px solid var(--accent);
-    border-radius: 6px;
-    padding: 24px 28px;
-    box-sizing: border-box;
-  }
-
-  .day-card-arrow-col {
-    flex-shrink: 0;
-    width: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  @media (max-width: 600px) {
-    .hackathon-days-grid { flex-direction: column; gap: 8px; }
-    .day-card-arrow-col { width: 100%; height: 32px; transform: rotate(90deg); }
-  }
-
-  .day-card-num {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 8px;
-  }
-
-  .day-card-title {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .day-card-meta {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 14px;
-  }
-
-  .day-card-desc {
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
-
-  /* Idea grid */
-  .idea-grid-label {
-    font-size: 11px;
-    color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
-    font-style: italic;
-    margin-bottom: 12px;
-  }
-
-  .idea-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-
-  @media (max-width: 700px) {
-    .idea-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  .idea-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0;
-  cursor: pointer;
-  height: 160px;
-  perspective: 1000px;
-}
-
-.idea-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.5s;
-  transform-style: preserve-3d;
-}
-
-.idea-card.flipped .idea-card-inner {
-  transform: rotateY(180deg);
-}
-
-.idea-card:hover:not(.flipped) {
-  border-color: var(--accent);
-  background: var(--bg3);
-}
-
-.idea-card-front, .idea-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  padding: 16px 18px;
-  border-radius: 6px;
-}
-
-.idea-card-back {
-  transform: rotateY(180deg);
-  background: var(--bg3);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.idea-card-back .idea-type {
-  font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-.idea-card-hint {
-  font-size: 9px;
-  color: var(--text-dim);
-  font-family: 'JetBrains Mono', monospace;
-  position: absolute;
-  bottom: 12px;
-  right: 14px;
-}
-
-.idea-card.ghost { background: transparent; border-style: dashed; }
-.idea-card.ghost:hover:not(.flipped) { border-color: var(--accent); background: transparent; }
-
-  .idea-num {
-    font-size: 10px;
-    color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 8px;
-  }
-
-  .idea-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
+  .hackathon-banner { margin-bottom: 28px; }
+  .hackathon-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hk-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 14px; border: 1px solid var(--border-bright); border-radius: 20px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); }
+  .hk-pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .hackathon-days-grid { display: flex; align-items: stretch; margin-bottom: 20px; }
+  .day-card { flex: 1 1 0; min-width: 0; background: var(--bg2); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: 6px; padding: 24px 28px; }
+  .day-card-arrow-col { flex-shrink: 0; width: 40px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .day-card-num   { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+  .day-card-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .day-card-meta  { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 14px; }
+  .day-card-desc  { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .idea-grid-label { font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-style: italic; margin-bottom: 12px; }
+  .idea-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .idea-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; height: 160px; perspective: 1000px; }
+  .idea-card-inner { position: relative; width: 100%; height: 100%; transition: transform .5s; transform-style: preserve-3d; }
+  .idea-card.flipped .idea-card-inner { transform: rotateY(180deg); }
+  .idea-card:hover:not(.flipped) { border-color: var(--accent); background: var(--bg3); }
+  .idea-card-front, .idea-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; padding: 16px 18px; border-radius: 6px; }
+  .idea-card-back { transform: rotateY(180deg); background: var(--bg3); display: flex; flex-direction: column; justify-content: center; }
+  .idea-card-back .idea-type { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+  .idea-card-hint { font-size: 9px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; position: absolute; bottom: 12px; right: 14px; }
+  .idea-card.ghost { background: transparent; border-style: dashed; }
+  .idea-card.ghost:hover:not(.flipped) { border-color: var(--accent); background: transparent; }
+  .idea-num   { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+  .idea-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
   .idea-card.ghost .idea-title { color: var(--text-muted); }
-
-  .idea-type {
-    font-size: 11px;
-    color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
-  }
-    font-style: italic;
-    margin-bottom: 12px;
-  }
-
-  .idea-card { cursor: default; }
-
-  .idea-tooltip {
-    position: fixed;
-    background: var(--bg3);
-    border: 1px solid var(--border-bright);
-    border-radius: 5px;
-    padding: 10px 14px;
-    font-size: 11px;
-    color: var(--text-muted);
-    max-width: 240px;
-    line-height: 1.6;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
-    z-index: 200;
-    font-family: 'JetBrains Mono', monospace;
-  }
+  .idea-type  { font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .idea-tooltip { position: fixed; background: var(--bg3); border: 1px solid var(--border-bright); border-radius: 5px; padding: 10px 14px; font-size: 11px; color: var(--text-muted); max-width: 240px; line-height: 1.6; pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 200; font-family: 'JetBrains Mono', monospace; }
   .idea-tooltip.visible { opacity: 1; }
 
-
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 32px;
-    align-items: stretch;
-  }
-
-  @media (max-width: 700px) {
-    .two-col { grid-template-columns: 1fr; }
-  }
-
-  .info-panel {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 28px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .info-panel-title {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .big-number {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 64px;
-    font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .big-number-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 20px;
-  }
-
-  .stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-  }
+  /* ─── INFO PANELS ─── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; align-items: stretch; }
+  .info-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 28px; }
+  .info-panel-title { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+  .big-number { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 64px; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
   .stat-row:last-child { border-bottom: none; }
   .stat-label { color: var(--text-muted); }
   .stat-value { color: var(--text); font-weight: 500; }
-
-  .criteria-list {
-    list-style: none;
-  }
-
-  .criteria-item {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-  }
+  .criteria-list { list-style: none; }
+  .criteria-item { display: flex; gap: 16px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
   .criteria-item:last-child { border-bottom: none; }
-
-  .criteria-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    line-height: 1.6;
-    flex-shrink: 0;
-    width: 24px;
-    opacity: 0.7;
-  }
-
+  .criteria-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--accent); line-height: 1.6; flex-shrink: 0; width: 24px; opacity: .7; }
   .criteria-text strong { color: var(--text); display: block; margin-bottom: 2px; font-size: 13px; }
   .criteria-text { color: var(--text-muted); line-height: 1.5; }
 
-  .prize-tba {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--accent);
-}
+  /* ─── TERMINAL ─── */
+  .terminal { margin: 60px 60px 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .terminal-bar { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .terminal-bar .dots { gap: 5px; }
+  .terminal-bar .dot { width: 10px; height: 10px; }
+  .terminal-title { font-size: 11px; color: var(--text-dim); margin-left: 6px; }
+  .terminal-body { padding: 20px 24px 24px; font-size: 12px; line-height: 2; min-height: 140px; }
+  .t-line    { display: block; }
+  .t-prompt  { color: #3fb950; }
+  .t-cmd     { color: #e6edf3; }
+  .t-out     { color: #656d76; }
+  .t-success { color: #3fb950; }
+  .t-warn    { color: #ffcb05; }
+  .t-cursor  { display: inline-block; width: 7px; height: 13px; background: #e6edf3; vertical-align: text-bottom; margin-left: 2px; animation: blink 1s step-end infinite; }
 
-.prize-shimmer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.prize-shimmer-bar {
-  height: 12px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--bg3) 25%, var(--border) 50%, var(--bg3) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.8s infinite;
-  width: 100%;
-}
-
-.prize-shimmer-bar.short {
-  width: 40%;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
   /* ─── FOOTER ─── */
-  .footer {
-    padding: 32px 60px 40px;
-    border-top: 1px solid var(--border);
-    margin-top: 60px;
-  }
-
-  .footer-code {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 32px 36px;
-    max-width: 600px;
-    margin-bottom: 48px;
-  }
-
-  .footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .footer-brand {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--text-muted);
-  }
+  .footer { padding: 32px 60px 40px; border-top: 1px solid var(--border); margin-top: 60px; }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-brand { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 800; color: var(--text-muted); }
   .footer-brand span { color: var(--accent); }
-
-  .footer-meta {
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-
-  a[style*="color:var(--accent)"]:hover { text-decoration: underline; }
-  a[style*="color:var(--accent)"] { text-decoration: none; }
-  a[style*="color:var(--accent)"]:hover { text-decoration: underline; }
+  .footer-meta { font-size: 11px; color: var(--text-dim); }
 
   /* ─── STATUS BAR ─── */
-  .statusbar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--accent);
-    color: #000;
-    font-size: 11px;
-    padding: 3px 16px;
-    display: flex;
-    gap: 24px;
-    align-items: center;
-    z-index: 100;
-    flex-wrap: nowrap;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
+  .statusbar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--accent); color: #000; font-size: 11px; padding: 3px 16px; display: flex; gap: 24px; align-items: center; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
   .statusbar-item { display: flex; align-items: center; gap: 5px; }
   .statusbar-right { margin-left: auto; display: flex; gap: 20px; }
 
   /* ─── SECTION DIVIDER ─── */
-  .section-divider {
-    padding: 0 60px;
-    margin: 40px 0 0;
-  }
-
-  .divider-line {
-    border: none;
-    border-top: 1px solid var(--border);
-  }
-
-  .divider-comment {
-    font-size: 12px;
-    color: var(--text-dim);
-    font-style: italic;
-    padding: 12px 0 0;
-  }
+  .section-divider { padding: 0 60px; margin: 40px 0 0; }
+  .divider-line { border: none; border-top: 1px solid var(--border); }
+  .divider-comment { font-size: 12px; color: var(--text-dim); font-style: italic; padding: 12px 0 0; }
 
   /* ─── SCROLL ANIMATIONS ─── */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .fade-in.visible {
-    opacity: 1;
-    transform: none;
-  }
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity .5s ease, transform .5s ease; }
+  .fade-in.visible { opacity: 1; transform: none; }
+
+  a[style*="color:var(--accent)"] { text-decoration: none; }
+  a[style*="color:var(--accent)"]:hover { text-decoration: underline; }
 
   /* ─── RESPONSIVE ─── */
   @media (max-width: 900px) {
@@ -1306,45 +559,34 @@
     .section, .hero, .footer { padding-left: 24px; padding-right: 24px; }
     .section-divider { padding: 0 24px; }
     .hero { padding-top: 40px; min-height: auto; justify-content: flex-start; }
+    .winner-content-inner { padding: 28px 24px 32px; }
+    .terminal { margin: 32px 24px 0; }
+    .hackathon-days-grid { flex-direction: column; gap: 8px; }
+    .day-card-arrow-col { width: 100%; height: 32px; transform: rotate(90deg); }
+    .idea-grid { grid-template-columns: repeat(2,1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .hs-row { grid-template-columns: 80px 1fr 90px; gap: 0 8px; }
+    .info-panel { padding: 20px; }
+    .statusbar-right { display: none; }
+    .pane-tabs .tab { flex-shrink: 0; }
   }
 
   @media (hover: none) {
-    .idea-card:hover:not(.flipped) {
-      border-color: var(--border);
-      background: var(--bg2);
-    }
-    .idea-card.ghost:hover:not(.flipped) {
-      border-color: var(--border);
-      background: transparent;
-    }
-  }
-  
-  @media (max-width: 600px) {
-    .tabs { overflow-x: auto; }
-    .tabs .tab { flex-shrink: 0; }
-    .hackathon-hero { padding: 24px; }
-    .info-panel { padding: 20px; }
-    .footer { padding: 32px 24px 32px; }
-    .terminal { margin: 32px 24px 0; }
-    .day-row { max-width: 100%; flex-direction: column; }
-    .day-sep { padding: 8px 0; border-left: none; border-right: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .hs-row { grid-template-columns: 80px 1fr 90px; gap: 0 8px; }
-    .statusbar-right { display: none; }
+    .idea-card:hover:not(.flipped) { border-color: var(--border); background: var(--bg2); }
+    .idea-card.ghost:hover:not(.flipped) { border-color: var(--border); background: transparent; }
   }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
-
-  /* Selection */
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  ::-webkit-scrollbar-thumb:active { background: var(--accent); }
   ::selection { background: var(--selection); }
 </style>
 </head>
 <body>
 
-<!-- WINDOW CHROME -->
+<!-- CHROME: titlebar only -->
 <div class="window-chrome">
   <div class="titlebar">
     <div class="dots">
@@ -1354,491 +596,385 @@
     </div>
     <div class="window-title">ITHS_Hackathon_2026</div>
   </div>
-  <div class="tabs">
-    <a class="tab active" href="#hero">README.md</a>
-    <a class="tab" href="#workshops">workshops.json</a>
-    <a class="tab" href="#hackathon">hackathon.config</a>
-    <a class="tab" href="#participants">format.ts</a>
-  </div>
 </div>
 
-<!-- LAYOUT -->
 <div class="ide-layout">
 
-  <!-- SIDEBAR: TL;DR panel -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <div class="sb-facts">
       <div class="sb-tldr-label">TL;DR</div>
+      <div class="sb-fact"><span class="sb-fact-key">Winner:</span><span class="sb-fact-val">ITHS Pulse</span></div>
       <div class="sb-fact"><span class="sb-fact-key">Workshops:</span><span class="sb-fact-val">Apr 14&ndash;24,<br>10:45&ndash;12:20</span></div>
       <div class="sb-fact"><span class="sb-fact-key">Hackathon:</span><span class="sb-fact-val">Apr 27, 9:00&ndash;14:00</span></div>
       <div class="sb-fact"><span class="sb-fact-key">Pitching:</span><span class="sb-fact-val">Apr 28, 9:00&ndash;12:00</span></div>
       <div class="sb-fact"><span class="sb-fact-key">Theme:</span><span class="sb-fact-val">Make ITHS Better</span></div>
       <div class="sb-fact"><span class="sb-fact-key">Attendees:</span><span class="sb-fact-val">60 total,<br>teams of 5&ndash;6</span></div>
-      <div class="sb-fact"><span class="sb-fact-key">Prize:</span><span class="sb-fact-val">TBD</span></div>
     </div>
-
-    <div class="sb-powered">
-      Powered by <strong>LCube Studios</strong>
-    </div>
-
+    <div class="sb-powered">Powered by <strong>LCube Studios</strong></div>
   </aside>
 
   <!-- EDITOR -->
   <div class="editor">
-
-    <!-- LINE NUMBERS: spacer keeps flex layout; fixed overlay does the rendering -->
     <div class="line-numbers" id="lineNumbersSpacer"></div>
     <div class="line-numbers-fixed" id="lineNumbersFixed">
-      <div class="line-numbers-inner" id="lineNumbersInner">
-        <!-- populated by JS -->
-      </div>
+      <div class="line-numbers-inner" id="lineNumbersInner"></div>
     </div>
 
-    <!-- CONTENT -->
     <div class="content">
 
-      <!-- ── HERO ── -->
+      <!-- WINNER "PANE" -->
+      <div class="winner-section">
+        <div class="pane-tabs" id="winnerTabs">
+          <span class="tab winner-tab active" data-tab="winner">winner.md</span>
+          <span class="tab winner-tab" data-tab="feedback">feedback.md</span>
+        </div>
+        <div class="winner-content-inner" id="winnerContent">
+          <!-- WINNER TAB -->
+          <div class="tab-content" id="tab-winner" style="display:block;">
+            <div class="winner-eyebrow">// winner.md</div>
+            <div class="winner-project-name">ITHS Pulse</div>
+            <div class="winner-project-desc">A student wellness check-in and support dashboard, built to make ITHS better.</div>
+
+            <div class="winner-demo-block">
+              <a class="winner-cta-btn" href="https://haza-haza.github.io/ITHS-Pulse-Student-Wellbeing/" target="_blank">View ITHS Pulse &rarr;</a>
+              <div class="winner-demo-note">// To demo: enter any 9-digit number and a name to sign in</div>
+            </div>
+
+            <div class="winner-block">
+              <div class="winner-block-label">// created_by/team_members</div>
+              <ul class="winner-members">
+                <li class="winner-member">Rivera, Chloe</li>
+                <li class="winner-member">Rodriguez, Ashley</li>
+                <li class="winner-member">Setiadi, Hazael</li>
+                <li class="winner-member">Rahman, Tamim</li>
+                <li class="winner-member">Shahriar, SM Ahnaf</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- FEEDBACK TAB -->
+          <div class="tab-content" id="tab-feedback" style="display:none;">
+            <div class="feedback-form-wrap">
+              <div class="feedback-header">
+                <div class="winner-eyebrow">// feedback.md</div>
+              </div>
+              <form id="feedbackForm" class="feedback-form">
+                <div class="form-group">
+                  <label for="fb-name">Name</label>
+                  <input type="text" id="fb-name" name="fb-name" placeholder="Your name" data-entry="entry.148593013">
+                </div>
+
+                <div class="form-group">
+                  <label for="fb-email">Email</label>
+                  <input type="text" id="fb-email" name="fb-email" placeholder="you@example.com" data-entry="entry.2050200366">
+                  <div class="form-error" id="emailError" style="display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="fb-went-well">What went well?</label>
+                  <textarea id="fb-went-well" name="fb-went-well" rows="3" placeholder="Share what you enjoyed..." data-entry="entry.305460765"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="fb-learned">What did you learn?</label>
+                  <textarea id="fb-learned" name="fb-learned" rows="3" placeholder="Key takeaway from the event..." data-entry="entry.630749498"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="fb-improve">What could improve?</label>
+                  <textarea id="fb-improve" name="fb-improve" rows="3" placeholder="Ideas for next time..." data-entry="entry.331259388"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="fb-comments">Other comments</label>
+                  <textarea id="fb-comments" name="fb-comments" rows="3" placeholder="Anything else on your mind..." data-entry="entry.1559577797"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="fb-recommend">Recommend this event?</label>
+                  <select id="fb-recommend" name="fb-recommend" data-entry="entry.832911484">
+                    <option value="">— Select —</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="fb-future">Future hackathons?</label>
+                  <select id="fb-future" name="fb-future" data-entry="entry.1192079255">
+                    <option value="">— Select —</option>
+                    <option value="Yes">Yes</option>
+                    <option value="Maybe">Maybe</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Overall impression</label>
+                  <div class="rating-dots">
+                    <input type="hidden" id="fb-rating" name="fb-rating" data-entry="entry.588922830" value="0">
+                    <div class="dots-container" id="dotsContainer">
+                      <div class="dot-item"><span class="dot" data-rating="1"></span><span class="dot-label">1</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="2"></span><span class="dot-label">2</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="3"></span><span class="dot-label">3</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="4"></span><span class="dot-label">4</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="5"></span><span class="dot-label">5</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="6"></span><span class="dot-label">6</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="7"></span><span class="dot-label">7</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="8"></span><span class="dot-label">8</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="9"></span><span class="dot-label">9</span></div>
+                      <div class="dot-item"><span class="dot" data-rating="10"></span><span class="dot-label">10</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="feedback-submit-btn">Submit Feedback</button>
+              </form>
+
+              <div class="feedback-success" id="feedbackSuccess" style="display:none;">
+                <div class="success-message">
+                  <div class="success-icon">✓</div>
+                  <div class="success-text">
+                    <div class="success-title">Thank you!</div>
+                    <div class="success-desc">Your feedback has been received and will help us improve future events.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE DIVIDER -->
+      <div class="pane-divider"></div>
+
+      <!-- CONTENT "PANE" tab bar -->
+      <div class="pane-tabs" id="contentTabs">
+        <a class="tab active" href="#hero">README.md</a>
+        <a class="tab" href="#workshops">workshops.json</a>
+        <a class="tab" href="#hackathon">hackathon.config</a>
+        <a class="tab" href="#participants">format.ts</a>
+      </div>
+
+      <!-- HERO -->
       <section class="hero" id="hero">
         <div class="comment-block">
           <div class="comment"># ITHS Hackathon 2026</div>
           <div class="comment"># Version: 1.0.0</div>
           <div class="comment"># Last modified: April 2026</div>
         </div>
-
         <h1 class="hero-greeting">Hello, ITHS!<span class="cursor"></span></h1>
-
         <p class="hero-subtitle">
-          Your hackathon is approaching!<br>Familiarize yourself with the details below, and get ready to <a href="#hackathon" style="color:var(--accent);">Make ITHS Better →</a>
+          Your hackathon is approaching!<br>Familiarize yourself with the details below, and get ready to <a href="#hackathon" style="color:var(--accent);">Make ITHS Better &rarr;</a>
         </p>
-
         <div class="hero-schedule">
-          <div class="hs-row hs-header">
-            <span>Date</span>
-            <span>Event</span>
-            <span>Time</span>
-          </div>
+          <div class="hs-row hs-header"><span>Date</span><span>Event</span><span>Time</span></div>
           <div class="hs-row">
-            <div class="hs-date">
-              <span class="hs-month">APR</span>
-              <span class="hs-day">14&ndash;24</span>
-            </div>
-            <div class="hs-event">Workshops<span class="hs-sub">AI · UI/UX · Backend · Fullstack · Pitching</span></div>
+            <div class="hs-date"><span class="hs-month">APR</span><span class="hs-day">14&ndash;24</span></div>
+            <div class="hs-event">Workshops<span class="hs-sub">AI &middot; UI/UX &middot; Backend &middot; Fullstack &middot; Pitching</span></div>
             <div class="hs-time">10:45&ndash;12:20</div>
           </div>
           <div class="hs-row">
-            <div class="hs-date">
-              <span class="hs-month">APR</span>
-              <span class="hs-day">27</span>
-            </div>
+            <div class="hs-date"><span class="hs-month">APR</span><span class="hs-day">27</span></div>
             <div class="hs-event">Hackathon<span class="hs-sub">Build your MVP</span></div>
             <div class="hs-time">9:00&ndash;14:00</div>
           </div>
           <div class="hs-row">
-            <div class="hs-date">
-              <span class="hs-month">APR</span>
-              <span class="hs-day">28</span>
-            </div>
-            <div class="hs-event">Pitching & Judging<span class="hs-sub">3 min pitch + Q&A ·<br>Finalists advance to a second round</span></div>
-            <div class="hs-time">9:00&dash;12:00</div>
+            <div class="hs-date"><span class="hs-month">APR</span><span class="hs-day">28</span></div>
+            <div class="hs-event">Pitching &amp; Judging<span class="hs-sub">3 min pitch + Q&amp;A &middot;<br>Finalists advance to a second round</span></div>
+            <div class="hs-time">9:00&ndash;12:00</div>
           </div>
         </div>
-
       </section>
 
-      <!-- DIVIDER -->
-      <div class="section-divider">
-        <hr class="divider-line">
-        <div class="divider-comment">// Section 2: Speaker introductions</div>
-      </div>
+      <div class="section-divider"><hr class="divider-line"><div class="divider-comment">// Section 2: Speaker introductions</div></div>
 
-      <!-- ── WORKSHOPS ── -->
+      <!-- WORKSHOPS -->
       <section class="section fade-in" id="workshops">
         <div class="section-header">
           <div class="section-tag">02 &nbsp;workshops.json</div>
           <h2 class="section-title">The Schedule</h2>
-          <p class="section-desc">
-            Six sessions, led by experts in their respective fields, covering unique topics to help you prepare for the hackathon (and think bigger beyond it).
-          </p>
+          <p class="section-desc">Six sessions, led by experts in their respective fields, covering unique topics to help you prepare for the hackathon (and think bigger beyond it).</p>
         </div>
-
-        <!-- Timeline -->
         <div class="timeline" style="margin-top:24px;">
           <div class="timeline-spine"></div>
 
           <div class="workshop-item">
-            <div class="workshop-dot-col">
-              <a href="https://www.linkedin.com/in/luismunoz07/" target="_blank" class="workshop-avatar av-ai">
-                <img src="luismunoz.jpeg" alt="Luis Muñoz">
-              </a>
-            </div>
+            <div class="workshop-dot-col"><a href="https://www.linkedin.com/in/luismunoz07/" target="_blank" class="workshop-avatar av-ai"><img src="luismunoz.jpeg" alt="Luis Muñoz"></a></div>
             <div class="workshop-inner">
               <div class="workshop-date">Tuesday, April 14</div>
               <div class="workshop-title">Luis Muñoz</div>
               <div class="workshop-speaker">AI</div>
-              <div class="workshop-desc">Founder & CEO, Crypto Repair, LCube Studios, and Hodie et Nunc</div>
+              <div class="workshop-desc">Founder &amp; CEO, Crypto Repair, LCube Studios, and Hodie et Nunc</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
-              <div class="workshop-desc" style="margin-top:8px;">
-                <a href="https://drive.google.com/drive/folders/1EX2YWs85kL8mXVRpvwpY_nte2Xrs39pn?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session →</a>
-              </div>
+              <div class="workshop-desc" style="margin-top:8px;"><a href="https://drive.google.com/drive/folders/1EX2YWs85kL8mXVRpvwpY_nte2Xrs39pn?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session &rarr;</a></div>
             </div>
           </div>
 
-          <div class="workshop-item workshop-item-grouped">
-            <div class="workshop-dot-col">
-              <a href="https://www.linkedin.com/in/imzafar/" target="_blank" class="workshop-avatar av-ai">
-                <img src="imran.jpeg" alt="Imran Zafar">
-              </a>
-            </div>
+          <div class="workshop-item">
+            <div class="workshop-dot-col"><a href="https://www.linkedin.com/in/imzafar/" target="_blank" class="workshop-avatar av-ai"><img src="imran.jpeg" alt="Imran Zafar"></a></div>
             <div class="workshop-inner">
               <div class="workshop-date">Thursday, April 16</div>
               <div class="workshop-title">Imran Zafar</div>
               <div class="workshop-speaker">AI</div>
-              <div class="workshop-desc">Managing Director & Global Head of Data Services, S&P Global</div>
+              <div class="workshop-desc">Managing Director &amp; Global Head of Data Services, S&amp;P Global</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
-          
               <hr class="workshop-inner-divider">
-          
-              <div style="display:flex; gap:28px; align-items:flex-start; margin-top:28px; margin-left:-92px;">
-                <a href="https://www.linkedin.com/in/sudeep-kesh-77106b186/" target="_blank" class="workshop-avatar av-ai" style="margin-top:0; flex-shrink:0;">
-                  <img src="sudeep.jpeg" alt="Sudeep Kesh">
-                </a>
+              <div style="display:flex;gap:28px;align-items:flex-start;margin-top:28px;margin-left:-92px;">
+                <a href="https://www.linkedin.com/in/sudeep-kesh-77106b186/" target="_blank" class="workshop-avatar av-ai" style="margin-top:0;flex-shrink:0;"><img src="sudeep.jpeg" alt="Sudeep Kesh"></a>
                 <div>
                   <div class="workshop-date">Thursday, April 16</div>
                   <div class="workshop-title">Sudeep Kesh</div>
                   <div class="workshop-speaker">AI</div>
-                  <div class="workshop-desc">Chief Innovation Officer, S&P Global</div>
+                  <div class="workshop-desc">Chief Innovation Officer, S&amp;P Global</div>
                   <div class="workshop-time">10:45&ndash;12:20</div>
-                  <div class="workshop-desc" style="margin-top:8px;">
-                    <a href="https://drive.google.com/drive/folders/16MCEj_bdSxIdh4DNgUHw_SwYibb5A0j2?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session →</a>
-                  </div>
+                  <div class="workshop-desc" style="margin-top:8px;"><a href="https://drive.google.com/drive/folders/16MCEj_bdSxIdh4DNgUHw_SwYibb5A0j2?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session &rarr;</a></div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="workshop-item">
-            <div class="workshop-dot-col">
-              <a href="https://www.linkedin.com/in/jason-j-97022b13a/" target="_blank" class="workshop-avatar av-uiux">
-                <img src="JasonJerez.jpeg" alt="Jason Jerez">
-              </a>
-            </div>
+            <div class="workshop-dot-col"><a href="https://www.linkedin.com/in/jason-j-97022b13a/" target="_blank" class="workshop-avatar av-uiux"><img src="JasonJerez.jpeg" alt="Jason Jerez"></a></div>
             <div class="workshop-inner">
               <div class="workshop-date">Friday, April 17</div>
               <div class="workshop-title">Jason Jerez</div>
               <div class="workshop-speaker">UI/UX</div>
               <div class="workshop-desc">Freelance Web Developer and Designer</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
-              <div class="workshop-desc" style="margin-top:8px;">
-                <a href="https://drive.google.com/drive/folders/1ReG2pF4lTRhRMeUaQ-IK9XTpCDVLZkJr?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session →</a>
-              </div>
+              <div class="workshop-desc" style="margin-top:8px;"><a href="https://drive.google.com/drive/folders/1ReG2pF4lTRhRMeUaQ-IK9XTpCDVLZkJr?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session &rarr;</a></div>
             </div>
           </div>
 
           <div class="workshop-item">
-            <div class="workshop-dot-col">
-              <a href="https://www.linkedin.com/in/yoshihiro-olson/" target="_blank" class="workshop-avatar av-back">
-                <img src="YoshiOlson.jpeg" alt="Yoshihiro Olson">
-              </a>
-            </div>
+            <div class="workshop-dot-col"><a href="https://www.linkedin.com/in/yoshihiro-olson/" target="_blank" class="workshop-avatar av-back"><img src="YoshiOlson.jpeg" alt="Yoshihiro Olson"></a></div>
             <div class="workshop-inner">
               <div class="workshop-date">Monday, April 20</div>
               <div class="workshop-title">Yoshihiro Olson</div>
               <div class="workshop-speaker">Backend</div>
               <div class="workshop-desc">Senior Software Engineer</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
-              <div class="workshop-desc" style="margin-top:8px;">
-                <a href="https://drive.google.com/drive/folders/1w9JnHjKg2UDn63eUYsA3EGkf3P49sgDI?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session →</a>
-              </div>              
+              <div class="workshop-desc" style="margin-top:8px;"><a href="https://drive.google.com/drive/folders/1w9JnHjKg2UDn63eUYsA3EGkf3P49sgDI?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session &rarr;</a></div>
             </div>
           </div>
 
           <div class="workshop-item">
-            <div class="workshop-dot-col">
-              <a href="https://www.linkedin.com/in/demaire-dowdy-m-s-ed-mpa-1a7639a3/" target="_blank" class="workshop-avatar av-back">
-                <img src="demaire.jpeg" alt="Demaire Dowdy">
-              </a>
-            </div>
+            <div class="workshop-dot-col"><a href="https://www.linkedin.com/in/demaire-dowdy-m-s-ed-mpa-1a7639a3/" target="_blank" class="workshop-avatar av-back"><img src="demaire.jpeg" alt="Demaire Dowdy"></a></div>
             <div class="workshop-inner">
               <div class="workshop-date">Tuesday, April 21</div>
               <div class="workshop-title">Demaire Dowdy</div>
               <div class="workshop-speaker">Cybersecurity</div>
               <div class="workshop-desc">Cybersecurity Educator, ITHS</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
-              <div class="workshop-desc" style="margin-top:8px;">
-                <a href="https://drive.google.com/drive/folders/1MbKIBi-PUSxZzBgvK3zfLUOLxk3Fd1L2?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session →</a>
-              </div>              
+              <div class="workshop-desc" style="margin-top:8px;"><a href="https://drive.google.com/drive/folders/1MbKIBi-PUSxZzBgvK3zfLUOLxk3Fd1L2?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session &rarr;</a></div>
             </div>
           </div>
 
           <div class="workshop-item">
-            <div class="workshop-dot-col">
-              <a href="https://www.linkedin.com/in/aaronalexzander/" target="_blank" class="workshop-avatar av-full">
-                <img src="AaronAlexander.jpeg" alt="Aaron Alexander">
-              </a>
-            </div>
+            <div class="workshop-dot-col"><a href="https://www.linkedin.com/in/aaronalexzander/" target="_blank" class="workshop-avatar av-full"><img src="AaronAlexander.jpeg" alt="Aaron Alexander"></a></div>
             <div class="workshop-inner">
               <div class="workshop-date">Wednesday, April 22</div>
               <div class="workshop-title">Aaron Alexander</div>
               <div class="workshop-speaker">Full Stack</div>
               <div class="workshop-desc">Senior Software Engineer, Valon</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
-              <div class="workshop-desc" style="margin-top:8px;">
-                <a href="https://drive.google.com/drive/folders/1nA4ZqP8vwPkaZJWjz8BjybYORPFDOXCN?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session →</a>
-              </div>                
+              <div class="workshop-desc" style="margin-top:8px;"><a href="https://drive.google.com/drive/folders/1nA4ZqP8vwPkaZJWjz8BjybYORPFDOXCN?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session &rarr;</a></div>
             </div>
           </div>
 
           <div class="workshop-item">
-            <div class="workshop-dot-col">
-              <a href="https://www.linkedin.com/in/shekhar-kapoor-3262979/" target="_blank" class="workshop-avatar av-pitch">SK</a>
-            </div>
+            <div class="workshop-dot-col"><a href="https://www.linkedin.com/in/shekhar-kapoor-3262979/" target="_blank" class="workshop-avatar av-pitch">SK</a></div>
             <div class="workshop-inner">
               <div class="workshop-date">Friday, April 24</div>
               <div class="workshop-title">Shekhar Kapoor</div>
               <div class="workshop-speaker">Pitching</div>
-              <div class="workshop-desc">Head of Automation Solutions, S&P Global</div>
+              <div class="workshop-desc">Head of Automation Solutions, S&amp;P Global</div>
               <div class="workshop-time">10:45&ndash;12:20</div>
-              <div class="workshop-desc" style="margin-top:8px;">
-                <a href="https://drive.google.com/drive/folders/1of8OwfFjPao9cyAXY112yMJWEusKdEI1?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session →</a>
-              </div>              
+              <div class="workshop-desc" style="margin-top:8px;"><a href="https://drive.google.com/drive/folders/1of8OwfFjPao9cyAXY112yMJWEusKdEI1?usp=drive_link" target="_blank" style="color:var(--accent);">Review the session &rarr;</a></div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- DIVIDER -->
-      <div class="section-divider">
-        <hr class="divider-line">
-        <div class="divider-comment">// Section 3: The main event</div>
-      </div>
+      <div class="section-divider"><hr class="divider-line"><div class="divider-comment">// Section 3: The main event</div></div>
 
-      <!-- ── HACKATHON ── -->
+      <!-- HACKATHON -->
       <section class="section fade-in" id="hackathon" style="padding-bottom:25px;">
-
-        <!-- Theme banner -->
         <div class="hackathon-banner">
           <div class="section-tag">03 &nbsp;hackathon.config</div>
-          <h2 class="section-title">Make <span class="accent">ITHS</span> Better</h2>
+          <h2 class="section-title">Make <span style="color:var(--accent);">ITHS</span> Better</h2>
           <p class="section-desc">Identify a real problem at your school and build a solution for it.</p>
           <div class="hackathon-pills" style="margin-top:20px;">
             <div class="hk-pill"><span class="hk-pill-dot" style="background:var(--accent)"></span>Deploy via GitHub Pages</div>
             <div class="hk-pill"><span class="hk-pill-dot" style="background:var(--accent)"></span>AI use required</div>
-            <div class="hk-pill"><span class="hk-pill-dot" style="background:var(--accent)"></span>3-min pitch + Q&A</div>
+            <div class="hk-pill"><span class="hk-pill-dot" style="background:var(--accent)"></span>3-min pitch + Q&amp;A</div>
           </div>
         </div>
-
-        <!-- Day cards -->
         <div class="hackathon-days-grid">
-          <div class="day-card day-card-1">
+          <div class="day-card">
             <div class="day-card-num">Monday, April 27</div>
             <div class="day-card-title">Day 1: Build</div>
             <div class="day-card-meta">9:00&ndash;14:00</div>
             <div class="day-card-desc">Form groups, split into three judging rooms, and build your MVP&mdash;something the judges can launch and interact with on the day.</div>
           </div>
-          <div class="day-card-arrow-col">→</div>
-          <div class="day-card day-card-2">
+          <div class="day-card-arrow-col">&rarr;</div>
+          <div class="day-card">
             <div class="day-card-num">Tuesday, April 28</div>
-            <div class="day-card-title">Day 2: Pitch & Judging</div>
+            <div class="day-card-title">Day 2: Pitch &amp; Judging</div>
             <div class="day-card-meta">9:00&ndash;12:00</div>
-            <div class="day-card-desc">Three minutes to pitch, two minutes for Q&A. (The top team from each room advances to a final round.)</div>
+            <div class="day-card-desc">Three minutes to pitch, two minutes for Q&amp;A. (The top team from each room advances to a final round.)</div>
           </div>
         </div>
-
-        <!-- Idea grid -->
         <div class="idea-grid-label">// idea_space/suggested_topics: starting points, not exhaustive</div>
         <div class="idea-grid">
-          <div class="idea-card" onclick="this.classList.toggle('flipped')">
-            <div class="idea-card-inner">
-              <div class="idea-card-front">
-                <div class="idea-num">01</div>
-                <div class="idea-title">Mental Health</div>
-                <div class="idea-type">Resource/Wellness App</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-              <div class="idea-card-back">
-                <div class="idea-type">A tool to support student wellbeing: mood check-ins, peer support, or mental health resources.</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-            </div>
-          </div>
-          <div class="idea-card" onclick="this.classList.toggle('flipped')">
-            <div class="idea-card-inner">
-              <div class="idea-card-front">
-                <div class="idea-num">02</div>
-                <div class="idea-title">Low-Bandwidth</div>
-                <div class="idea-type">Offline-First Tool</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-              <div class="idea-card-back">
-                <div class="idea-type">A lightweight resource that works on slow WiFi: cached content, fast load times, accessible to everyone.</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-            </div>
-          </div>
-          <div class="idea-card" onclick="this.classList.toggle('flipped')">
-            <div class="idea-card-inner">
-              <div class="idea-card-front">
-                <div class="idea-num">03</div>
-                <div class="idea-title">AI Literacy</div>
-                <div class="idea-type">Educational Website</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-              <div class="idea-card-back">
-                <div class="idea-type">Help users understand how AI actually works&mdash;the models, the bias, responsible use.</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-            </div>
-          </div>
-          <div class="idea-card" onclick="this.classList.toggle('flipped')">
-            <div class="idea-card-inner">
-              <div class="idea-card-front">
-                <div class="idea-num">04</div>
-                <div class="idea-title">Scheduling</div>
-                <div class="idea-type">Deadline/Reminder App</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-              <div class="idea-card-back">
-                <div class="idea-type">A smarter way to manage deadlines, reminders, and priorities, built around how students actually work.</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-            </div>
-          </div>
-          <div class="idea-card" onclick="this.classList.toggle('flipped')">
-            <div class="idea-card-inner">
-              <div class="idea-card-front">
-                <div class="idea-num">05</div>
-                <div class="idea-title">Financial Literacy</div>
-                <div class="idea-type">Budget/Spending Tracker</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-              <div class="idea-card-back">
-                <div class="idea-type">Practical tools for students managing money for the first time: budgeting, spending habits, financial basics.</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-            </div>
-          </div>
-          <div class="idea-card ghost" onclick="this.classList.toggle('flipped')">
-            <div class="idea-card-inner">
-              <div class="idea-card-front">
-                <div class="idea-num">✦</div>
-                <div class="idea-title">Your Idea</div>
-                <div class="idea-type"><em>// Undefined</em></div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-              <div class="idea-card-back">
-                <div class="idea-type">You know ITHS better than anyone. What's broken? What's missing? You decide.</div>
-                <div class="idea-card-hint">↻</div>
-              </div>
-            </div>
-          </div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')"><div class="idea-card-inner"><div class="idea-card-front"><div class="idea-num">01</div><div class="idea-title">Mental Health</div><div class="idea-type">Resource/Wellness App</div><div class="idea-card-hint">&#8635;</div></div><div class="idea-card-back"><div class="idea-type">A tool to support student wellbeing: mood check-ins, peer support, or mental health resources.</div><div class="idea-card-hint">&#8635;</div></div></div></div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')"><div class="idea-card-inner"><div class="idea-card-front"><div class="idea-num">02</div><div class="idea-title">Low-Bandwidth</div><div class="idea-type">Offline-First Tool</div><div class="idea-card-hint">&#8635;</div></div><div class="idea-card-back"><div class="idea-type">A lightweight resource that works on slow WiFi: cached content, fast load times, accessible to everyone.</div><div class="idea-card-hint">&#8635;</div></div></div></div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')"><div class="idea-card-inner"><div class="idea-card-front"><div class="idea-num">03</div><div class="idea-title">AI Literacy</div><div class="idea-type">Educational Website</div><div class="idea-card-hint">&#8635;</div></div><div class="idea-card-back"><div class="idea-type">Help users understand how AI actually works&mdash;the models, the bias, responsible use.</div><div class="idea-card-hint">&#8635;</div></div></div></div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')"><div class="idea-card-inner"><div class="idea-card-front"><div class="idea-num">04</div><div class="idea-title">Scheduling</div><div class="idea-type">Deadline/Reminder App</div><div class="idea-card-hint">&#8635;</div></div><div class="idea-card-back"><div class="idea-type">A smarter way to manage deadlines, reminders, and priorities, built around how students actually work.</div><div class="idea-card-hint">&#8635;</div></div></div></div>
+          <div class="idea-card" onclick="this.classList.toggle('flipped')"><div class="idea-card-inner"><div class="idea-card-front"><div class="idea-num">05</div><div class="idea-title">Financial Literacy</div><div class="idea-type">Budget/Spending Tracker</div><div class="idea-card-hint">&#8635;</div></div><div class="idea-card-back"><div class="idea-type">Practical tools for students managing money for the first time: budgeting, spending habits, financial basics.</div><div class="idea-card-hint">&#8635;</div></div></div></div>
+          <div class="idea-card ghost" onclick="this.classList.toggle('flipped')"><div class="idea-card-inner"><div class="idea-card-front"><div class="idea-num">?</div><div class="idea-title">Your Idea</div><div class="idea-type"><em>// Undefined</em></div><div class="idea-card-hint">&#8635;</div></div><div class="idea-card-back"><div class="idea-type">You know ITHS better than anyone. What's broken? What's missing? You decide.</div><div class="idea-card-hint">&#8635;</div></div></div></div>
         </div>
         <div class="idea-tooltip" id="ideaTooltip"></div>
-        <div class="idea-tooltip" id="ideaTooltip"></div>
-
       </section>
 
-      <!-- DIVIDER -->
-      <div class="section-divider">
-        <hr class="divider-line">
-        <div class="divider-comment">// Section 3.1: Supporting details</div>
-      </div>
+      <div class="section-divider"><hr class="divider-line"><div class="divider-comment">// Section 3.1: Supporting details</div></div>
 
-      <!-- ── PARTICIPANTS & JUDGING ── -->
+      <!-- PARTICIPANTS -->
       <section class="section fade-in" id="participants">
         <div class="section-header">
           <div class="section-tag">03.1 &nbsp;format.ts</div>
           <h2 class="section-title">The Setup</h2>
         </div>
-
         <div class="two-col">
           <div class="info-panel">
             <div class="info-panel-title">Attendees</div>
             <div class="big-number">60</div>
-            <div class="stat-row">
-              <span class="stat-label">Grades</span>
-              <span class="stat-value">11 and 12</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Team Size</span>
-              <span class="stat-value">5&ndash;6 persons</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Total Teams</span>
-              <span class="stat-value">10&ndash;12 teams</span>
-            </div>
+            <div class="stat-row"><span class="stat-label">Grades</span><span class="stat-value">11 and 12</span></div>
+            <div class="stat-row"><span class="stat-label">Team Size</span><span class="stat-value">5&ndash;6 persons</span></div>
+            <div class="stat-row"><span class="stat-label">Total Teams</span><span class="stat-value">10&ndash;12 teams</span></div>
           </div>
-
           <div class="info-panel">
             <div class="info-panel-title">Judging Criteria</div>
             <ul class="criteria-list">
-              <li class="criteria-item">
-                <div class="criteria-num">01</div>
-                <div class="criteria-text">
-                  <strong>Impact & Relevance</strong>
-                  Does your solution solve a real ITHS problem, with high potential to make a positive impact?
-                </div>
-              </li>
-              <li class="criteria-item">
-                <div class="criteria-num">02</div>
-                <div class="criteria-text">
-                  <strong>AI Implementation</strong>
-                  Does AI play an effective and efficient role in how you built your solution?
-                </div>
-              </li>
-              <li class="criteria-item">
-                <div class="criteria-num">03</div>
-                <div class="criteria-text">
-                  <strong>Technical Execution</strong>
-                  Is the frontend polished and the backend reliable? And are they working together?
-                </div>
-              </li>
-              <li class="criteria-item">
-                <div class="criteria-num">04</div>
-                <div class="criteria-text">
-                  <strong>Pitch & Presentation</strong>
-                  Is your problem clearly framed, and the demo live and showcased within 3 minutes?
-                </div>
-              </li>
-              <li class="criteria-item">
-                <div class="criteria-num">05</div>
-                <div class="criteria-text">
-                  <strong>Code Quality</strong>
-                  Is your code efficient, modular, and readable?
-                </div>
-              </li>
+              <li class="criteria-item"><div class="criteria-num">01</div><div class="criteria-text"><strong>Impact &amp; Relevance</strong>Does your solution solve a real ITHS problem, with high potential to make a positive impact?</div></li>
+              <li class="criteria-item"><div class="criteria-num">02</div><div class="criteria-text"><strong>AI Implementation</strong>Does AI play an effective and efficient role in how you built your solution?</div></li>
+              <li class="criteria-item"><div class="criteria-num">03</div><div class="criteria-text"><strong>Technical Execution</strong>Is the frontend polished and the backend reliable? And are they working together?</div></li>
+              <li class="criteria-item"><div class="criteria-num">04</div><div class="criteria-text"><strong>Pitch &amp; Presentation</strong>Is your problem clearly framed, and the demo live and showcased within 3 minutes?</div></li>
+              <li class="criteria-item"><div class="criteria-num">05</div><div class="criteria-text"><strong>Code Quality</strong>Is your code efficient, modular, and readable?</div></li>
             </ul>
           </div>
         </div>
-
-        <div class="idea-grid-label" style="margin-top:24px;">// prize.pending</div>
-        <div class="two-col" style="margin-top:0; display:block;">
-          <div class="info-panel">
-              <div class="info-panel-title">Prize</div>
-              <p style="font-size:13px; color:var(--text-muted); line-height:1.8; margin-bottom:20px;">Awarded to the winning team after two rounds of judging.</p>
-              <div class="prize-shimmer">
-                <div class="prize-shimmer-bar"></div>
-                <div class="prize-shimmer-bar short"></div>
-              </div>
-              <div class="prize-tba">→ To be determined</div>
-            </div>
-        </div>
       </section>
 
-      <!-- ── FOOTER / TERMINAL ── -->
+      <!-- FOOTER / TERMINAL -->
       <footer class="footer fade-in" id="footer">
         <div class="terminal">
           <div class="terminal-bar">
-            <div class="dots">
-              <div class="dot dot-red"></div>
-              <div class="dot dot-yellow"></div>
-              <div class="dot dot-green"></div>
-            </div>
-            <span class="terminal-title">bash — iths-hackathon</span>
+            <div class="dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+            <span class="terminal-title">bash &mdash; iths-hackathon</span>
           </div>
-          <div class="terminal-body" id="terminalBody">
-            <span class="t-cursor"></span>
-          </div>
+          <div class="terminal-body" id="terminalBody"><span class="t-cursor"></span></div>
         </div>
       </footer>
 
@@ -1848,8 +984,8 @@
 
 <!-- STATUS BAR -->
 <div class="statusbar">
-  <div class="statusbar-item">⎇ &nbsp;main</div>
-  <div class="statusbar-item">● &nbsp;README.md</div>
+  <div class="statusbar-item">&#8967; &nbsp;main</div>
+  <div class="statusbar-item" id="statusFile">&#9679; &nbsp;README.md</div>
   <div class="statusbar-right">
     <div class="statusbar-item">Markdown</div>
     <div class="statusbar-item">UTF-8</div>
@@ -1858,155 +994,270 @@
 </div>
 
 <script>
-  const lineInner = document.getElementById('lineNumbersInner');
-  const lineFixed = document.getElementById('lineNumbersFixed');
-  const LINE_H = 14 * 1.7; // px per line
-
-  // ─── BUILD LINE NUMBERS ───
-  function buildLineNumbers() {
-    if (!lineInner) return;
-    // Always measure the full scrollable page height live
-    const totalH = Math.max(
-      document.body.scrollHeight,
-      document.documentElement.scrollHeight
-    );
-    const count = Math.ceil(totalH / LINE_H) + 5;
-    if (lineInner._lastCount === count) return;
-    lineInner._lastCount = count;
-    let html = '';
-    for (let i = 1; i <= count; i++) html += `<span class="ln" id="ln${i}">${i}</span>`;
-    lineInner.innerHTML = html;
+  // ─── CONFETTI ───
+  function launchConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const colors = ['#ffcb05','#58a6ff','#3fb950','#ff5f57','#e6edf3','#ffbd2e','#d2a8ff'];
+    const particles = Array.from({ length: 110 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 120,
+      w: 7 + Math.random() * 7, h: 3 + Math.random() * 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2, rotV: (Math.random() - 0.5) * 0.14,
+      vx: (Math.random() - 0.5) * 3.5, vy: 2.5 + Math.random() * 3.5,
+    }));
+    const DUR = 3600; let start = null;
+    (function frame(ts) {
+      if (!start) start = ts;
+      const e = ts - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const a = e > DUR * 0.55 ? Math.max(0, 1 - (e - DUR * 0.55) / (DUR * 0.45)) : 1;
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.09; p.rot += p.rotV;
+        ctx.save(); ctx.globalAlpha = a; ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+      });
+      if (e < DUR) requestAnimationFrame(frame); else canvas.remove();
+    })(0);
   }
 
-  // Re-measure whenever anything on the page resizes
+  // ─── LINE NUMBERS ───
+  const lineInner = document.getElementById('lineNumbersInner');
+  const lineFixed = document.getElementById('lineNumbersFixed');
+  const LINE_H = 14 * 1.7;
+
+  function buildLineNumbers() {
+    if (!lineInner) return;
+    const totalH = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    const count = Math.ceil(totalH / LINE_H) + 5;
+    if (lineInner._n === count) return;
+    lineInner._n = count;
+    let h = '';
+    for (let i = 1; i <= count; i++) h += `<span class="ln">${i}</span>`;
+    lineInner.innerHTML = h;
+  }
+
   if (window.ResizeObserver) {
-    new ResizeObserver(() => { lineInner._lastCount = -1; buildLineNumbers(); }).observe(document.body);
+    new ResizeObserver(() => { lineInner._n = -1; buildLineNumbers(); }).observe(document.body);
   }
 
   function positionLineNumbers() {
     const spacer = document.getElementById('lineNumbersSpacer');
-    if (!spacer || !lineFixed) return;
-    lineFixed.style.left = spacer.getBoundingClientRect().left + 'px';
+    if (spacer && lineFixed) lineFixed.style.left = spacer.getBoundingClientRect().left + 'px';
   }
 
   function scrollLineNumbers() {
-    if (!lineInner) return;
-    lineInner.style.transform = `translateY(-${window.scrollY}px)`;
+    if (lineInner) lineInner.style.transform = `translateY(-${window.scrollY}px)`;
   }
 
-  // ─── STATUS BAR ───
-  const statusFile = document.querySelector('.statusbar .statusbar-item:nth-child(2)');
-  const sectionFileMap = { hero: 'README.md', workshops: 'workshops.json', hackathon: 'hackathon.config', participants: 'participants.ts', footer: 'participants.ts' };
-
-  // ─── FADE IN ON SCROLL ───
-  const fadeEls = document.querySelectorAll('.fade-in');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); });
-  }, { threshold: 0.08 });
-  fadeEls.forEach(el => observer.observe(el));
-
-  // ─── ACTIVE TAB + STATUS BAR ON SCROLL ───
+  // ─── ACTIVE CONTENT TAB + STATUS BAR ───
+  const statusFile = document.getElementById('statusFile');
   const sections = document.querySelectorAll('section[id], footer[id]');
-  const tabs = document.querySelectorAll('.tab[href]');
+  const contentTabs = document.querySelectorAll('#contentTabs .tab[href]');
+  const sectionFileMap = { hero:'README.md', workshops:'workshops.json', hackathon:'hackathon.config', participants:'format.ts', footer:'format.ts' };
 
   function onScroll() {
     scrollLineNumbers();
     buildLineNumbers();
     let current = 'hero';
-    sections.forEach(s => {
-      if (s.getBoundingClientRect().top < window.innerHeight * 0.4) current = s.id;
-    });
-    const activeHref = '#' + (current === 'footer' ? 'participants' : current);
-    tabs.forEach(t => t.classList.toggle('active', t.getAttribute('href') === activeHref));
-    if (statusFile) statusFile.textContent = '● ' + (sectionFileMap[current] || 'README.md');
+    sections.forEach(s => { if (s.getBoundingClientRect().top < window.innerHeight * 0.4) current = s.id; });
+    const href = '#' + (current === 'footer' ? 'participants' : current);
+    contentTabs.forEach(t => t.classList.toggle('active', t.getAttribute('href') === href));
+    if (statusFile) statusFile.textContent = '●  ' + (sectionFileMap[current] || 'README.md');
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', () => { positionLineNumbers(); buildLineNumbers(); }, { passive: true });
 
-  // ─── TYPING EFFECT ───
+  // ─── FADE-IN ───
+  const obs = new IntersectionObserver(entries => entries.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }), { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+  // ─── TYPING ───
   const greeting = document.querySelector('.hero-greeting');
-  const text = "Hello, ITHS!";
+  const text = 'Hello, ITHS!';
   let displayed = '';
   greeting.innerHTML = '<span class="cursor"></span>';
   setTimeout(() => {
     let i = 0;
-    const type = () => {
+    (function type() {
       if (i < text.length) {
         displayed += text[i++];
         greeting.innerHTML = displayed + '<span class="cursor"></span>';
         setTimeout(type, 50 + Math.random() * 40);
       }
-    };
-    type();
+    })();
   }, 400);
 
-  // ─── TERMINAL TYPEWRITER ───
+  // ─── TERMINAL ───
   const termBody = document.getElementById('terminalBody');
   const termLines = [
-    { delay: 0,    html: `<span class="t-prompt">student@iths:~$</span> <span class="t-cmd">cd hackathon-2026</span>` },
-    { delay: 700,  html: `<span class="t-prompt">student@iths:~/hackathon-2026$</span> <span class="t-cmd">npm run deploy</span>` },
-    { delay: 1400, html: `<span class="t-out">&gt; building project...</span>` },
-    { delay: 2000, html: `<span class="t-out">&gt; running tests...</span>` },
-    { delay: 2600, html: `<span class="t-success">✓ all checks passed</span>` },
-    { delay: 3100, html: `<span class="t-success">✓ deployed to github.io/iths-hackathon-2026</span>` },
-    { delay: 3800, html: `<span class="t-warn">→ See you April 14th.</span>` },
+    { delay:0,    html:`<span class="t-prompt">student@iths:~$</span> <span class="t-cmd">cd hackathon-2026</span>` },
+    { delay:700,  html:`<span class="t-prompt">student@iths:~/hackathon-2026$</span> <span class="t-cmd">npm run deploy</span>` },
+    { delay:1400, html:`<span class="t-out">&gt; building project...</span>` },
+    { delay:2000, html:`<span class="t-out">&gt; running tests...</span>` },
+    { delay:2600, html:`<span class="t-success">&#10003; all checks passed</span>` },
+    { delay:3100, html:`<span class="t-success">&#10003; deployed to github.io/iths-hackathon-2026</span>` },
+    { delay:3800, html:`<span style="color:var(--accent)">&#10003; Congratulations, ITHS Pulse.</span>` },
   ];
   let termStarted = false;
-
   function runTerminal() {
-    if (termStarted) return;
-    termStarted = true;
-    termBody.innerHTML = '';
-    termLines.forEach(({ delay, html }) => {
-      setTimeout(() => {
-        const span = document.createElement('span');
-        span.className = 't-line';
-        span.innerHTML = html;
-        const oldCursor = termBody.querySelector('.t-cursor');
-        if (oldCursor) oldCursor.remove();
-        termBody.appendChild(span);
-        const cursor = document.createElement('span');
-        cursor.className = 't-cursor';
-        termBody.appendChild(cursor);
-      }, delay);
+    if (termStarted) return; termStarted = true; termBody.innerHTML = '';
+    termLines.forEach(({ delay, html }) => setTimeout(() => {
+      const s = document.createElement('span'); s.className = 't-line'; s.innerHTML = html;
+      const old = termBody.querySelector('.t-cursor'); if (old) old.remove();
+      termBody.appendChild(s);
+      const cur = document.createElement('span'); cur.className = 't-cursor'; termBody.appendChild(cur);
+    }, delay));
+  }
+  new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) runTerminal(); }), { threshold: 0.3 }).observe(termBody);
+
+  // ─── WINNER TAB SWITCHING ───
+  const winnerTabs = document.querySelectorAll('#winnerTabs .tab');
+  winnerTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.getAttribute('data-tab');
+      winnerTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === tabName));
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = content.id === 'tab-' + tabName ? 'block' : 'none';
+      });
+      if (tabName === 'feedback') document.getElementById('feedbackForm').reset();
+    });
+  });
+
+  // ─── FEEDBACK FORM SUBMISSION ───
+  const feedbackForm = document.getElementById('feedbackForm');
+  const feedbackSuccess = document.getElementById('feedbackSuccess');
+  const submitBtn = feedbackForm ? feedbackForm.querySelector('.feedback-submit-btn') : null;
+  const emailInput = document.getElementById('fb-email');
+  const emailError = document.getElementById('emailError');
+
+  function validateForm() {
+    const fields = feedbackForm.querySelectorAll('[data-entry]:not([type="hidden"])');
+    let hasContent = false;
+    for (let field of fields) {
+      if (field.value && field.value.trim()) {
+        hasContent = true;
+        break;
+      }
+    }
+    return hasContent;
+  }
+
+  function updateSubmitButton() {
+    if (submitBtn) submitBtn.disabled = !validateForm();
+  }
+
+  function clearEmailError() {
+    emailError.style.display = 'none';
+    emailError.textContent = '';
+    emailInput.classList.remove('error');
+  }
+
+  if (emailInput) {
+    emailInput.addEventListener('input', clearEmailError);
+  }
+
+  function updateSubmitButton() {
+    if (submitBtn) submitBtn.disabled = !validateForm();
+  }
+
+  if (feedbackForm) {
+    feedbackForm.addEventListener('change', updateSubmitButton);
+    feedbackForm.addEventListener('input', updateSubmitButton);
+    feedbackForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearEmailError();
+
+      if (!validateForm()) {
+        alert('Please fill in at least one field.');
+        return;
+      }
+
+      const email = emailInput.value.trim();
+      if (email && !email.includes('@')) {
+        window.scrollTo(0, 0);
+        emailInput.classList.add('error');
+        emailError.textContent = '// Incorrect format';
+        emailError.style.display = 'block';
+        return;
+      }
+      if (email && !email.includes('.')) {
+        window.scrollTo(0, 0);
+        emailInput.classList.add('error');
+        emailError.textContent = '// Email must include a domain (e.g., example.com)';
+        emailError.style.display = 'block';
+        return;
+      }
+
+      const formData = new FormData();
+      const fields = feedbackForm.querySelectorAll('[data-entry]');
+      fields.forEach(field => {
+        const entry = field.getAttribute('data-entry');
+        const value = field.value || '';
+        formData.append(entry, value);
+      });
+
+      fetch('https://docs.google.com/forms/d/e/1FAIpQLSfyxTHO0-8BcVQs7rmSlyW0OLMy1pxm5A8YnE7cTwP-n_YHUw/formResponse', {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors'
+      }).then(() => {
+        window.scrollTo(0, 0);
+        feedbackForm.style.display = 'none';
+        feedbackSuccess.style.display = 'block';
+      }).catch(err => {
+        console.error('Form error:', err);
+        alert('Could not submit. Please try again.');
+      });
+    });
+    updateSubmitButton();
+  }
+
+  // ─── RATING DOTS ───
+  const dotsContainer = document.getElementById('dotsContainer');
+  const ratingInput = document.getElementById('fb-rating');
+  const dots = dotsContainer.querySelectorAll('.dot');
+
+  function updateDots(rating, preview = false) {
+    dots.forEach((dot, i) => {
+      const dotRating = i + 1;
+      const isActive = dotRating <= rating;
+      dot.classList.toggle(preview ? 'preview' : 'active', isActive);
+      if (!preview) dot.classList.remove('preview');
     });
   }
 
-  const termObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) runTerminal(); });
-  }, { threshold: 0.3 });
-  if (termBody) termObserver.observe(termBody);
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const rating = parseInt(dot.getAttribute('data-rating'));
+      ratingInput.value = rating;
+      updateDots(rating);
+    });
+    dot.addEventListener('mouseenter', () => {
+      const rating = parseInt(dot.getAttribute('data-rating'));
+      updateDots(rating, true);
+    });
+  });
 
-  // ─── IDEA CARD TOOLTIPS ───
-  const ideaCards = document.querySelectorAll('.idea-card[data-desc]');
-  const ideaTooltip = document.getElementById('ideaTooltip');
-  ideaCards.forEach(card => {
-    card.addEventListener('mouseenter', () => {
-      ideaTooltip.textContent = card.dataset.desc;
-      ideaTooltip.classList.add('visible');
-    });
-    card.addEventListener('mousemove', (e) => {
-      let x = e.clientX + 14, y = e.clientY + 14;
-      if (x + 254 > window.innerWidth) x = e.clientX - 254;
-      if (y + 80 > window.innerHeight) y = e.clientY - 80;
-      ideaTooltip.style.left = x + 'px';
-      ideaTooltip.style.top = y + 'px';
-    });
-    card.addEventListener('mouseleave', () => ideaTooltip.classList.remove('visible'));
+  dotsContainer.addEventListener('mouseleave', () => {
+    const currentRating = parseInt(ratingInput.value) || 0;
+    updateDots(currentRating);
   });
 
   // ─── INIT ───
   window.addEventListener('load', () => {
+    window.scrollTo(0, 0);
+    launchConfetti();
     buildLineNumbers();
     positionLineNumbers();
     scrollLineNumbers();
-    // Force re-measure at each milestone — fonts, images, animations all affect height
-    [100, 300, 700, 1500, 3000].forEach(ms => setTimeout(() => {
-      lineInner._lastCount = -1;
-      buildLineNumbers();
-      positionLineNumbers();
-    }, ms));
+    [100,300,700,1500,3000].forEach(ms => setTimeout(() => { lineInner._n = -1; buildLineNumbers(); positionLineNumbers(); }, ms));
   });
 </script>
 </body>
